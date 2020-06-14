@@ -12,7 +12,8 @@ import javax.annotation.PostConstruct;
 @CrossOrigin
 public class MathController {
 
-    MathOps mathOps;
+    private MathOps mathOps;
+    private final String BASE_URL = "/math/";
 
     @PostConstruct
     public void init(){
@@ -20,25 +21,27 @@ public class MathController {
     }
 
 
-
-    @GetMapping("/math/prime")
+    @GetMapping(BASE_URL + "prime")
     public String isPrime(@RequestParam(name="num", required = true) int num){
         return Integer.toString(num) + " " + (mathOps.isPrime(num)? "is prime.": "is not prime");
     }
 
-    @GetMapping("/math/primeFac")
+    @GetMapping(BASE_URL + "primeFac")
     public String primeFactor(@RequestParam(name="num", required = true) int num){
         return mathOps.primeFactors(num).toString();
     }
 
-    @GetMapping("/math/totient")
-    public String totient(@RequestParam(name="num", required = true) int num){
-        return Integer.toString(mathOps.totient(mathOps.primeFactors(num)));
-    }
-
-    @GetMapping("/math/evaluate")
+    @GetMapping(BASE_URL + "evaluate")
     public String evaluate(@RequestParam(name="expression", required = true) String expression){
         ExpressionEval expressionEval = new ExpressionEval();
         return expressionEval.Evaluate(expression);
     }
+
+    @GetMapping(BASE_URL + "totient")
+    public String totient(@RequestParam(name="num", required = true) int num){
+        return Integer.toString(mathOps.totient(mathOps.primeFactors(num)));
+    }
+
+//    @GetMapping(BASE_URL + "mod")
+//    public String totient(@RequestParam(name=""))
 }

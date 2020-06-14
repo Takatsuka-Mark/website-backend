@@ -3,7 +3,6 @@ package com.takatsuka.web.Expression;
 import com.takatsuka.web.MathOps;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -32,6 +31,7 @@ public class ExpressionEval {
         this.operators.put("/", new Operator(false, OperatorType.DIV, 3, "/"));
         this.operators.put("+", new Operator(false, OperatorType.ADD, 2, "+"));
         this.operators.put("-", new Operator(false, OperatorType.SUB, 2, "-"));
+        this.operators.put("mod", new Operator(false, OperatorType.MOD, 1, "mod"));
     }
 
     public String Evaluate(String expression){
@@ -47,6 +47,7 @@ public class ExpressionEval {
         patterns.add(numRegex); // double and integer
         patterns.add("[+\\-*/()^]");        // operators
         patterns.add("totient");            // functions
+        patterns.add("mod");
 
         tokens = new ArrayList<>();
 
@@ -154,6 +155,8 @@ public class ExpressionEval {
                     return Math.pow(evaluateAST(operator.left), evaluateAST(operator.right));
                 case "totient":
                     return mathOps.totient((int)evaluateAST(operator.left));
+                case "mod":
+                    return mathOps.mod((int)evaluateAST(operator.left), (int)evaluateAST(operator.right));
                 default:
                     return 0.0;
             }

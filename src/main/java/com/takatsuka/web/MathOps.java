@@ -55,4 +55,12 @@ public class MathOps {
     public int totient(int num){
         return totient(primeFactors(num));
     }
+
+    public int mod(int num, int base){
+        return num % base;
+    }
+
+    public int modInverse(int num, int base){
+        return 0;
+    }
 }

@@ -6,6 +6,7 @@ enum OperatorType {
     MUL,
     DIV,
     POW,
+    MOD,
 
     TOTIENT
 }
