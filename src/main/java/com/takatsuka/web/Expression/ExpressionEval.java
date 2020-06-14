@@ -36,9 +36,9 @@ public class ExpressionEval {
 
     public String Evaluate(String expression){
         tokenize(expression);
-//        final ASTNode tree = parseToAST();
-//        return Double.toString(evaluateAST(tree));
-        return Arrays.toString(tokens.toArray());
+        final ASTNode tree = parseToAST();
+        return Double.toString(evaluateAST(tree));
+//        return Arrays.toString(tokens.toArray());
     }
 
     private void tokenize(String expression){
