@@ -24,6 +24,7 @@ public class ExpressionEval {
 
         this.functions = new HashMap<>();
         this.functions.put("totient", new Operator(false, OperatorType.TOTIENT, 100, "totient"));
+        this.functions.put("sqrt", new Operator(false, OperatorType.SQRT, 4, "sqrt"));
 
         this.operators = new HashMap<>();
         this.operators.put("^", new Operator(true, OperatorType.POW, 4, "^"));
@@ -38,16 +39,15 @@ public class ExpressionEval {
         tokenize(expression);
         final ASTNode tree = parseToAST();
         return Double.toString(evaluateAST(tree));
-//        return Arrays.toString(tokens.toArray());
     }
 
     private void tokenize(String expression){
         final String numRegex = "(\\d*\\.\\d+)|(\\.\\d+)|(\\d+)";
         ArrayList<String> patterns = new ArrayList<>();
         patterns.add(numRegex); // double and integer
-        patterns.add("[+\\-*/()^]");        // operators
-        patterns.add("totient");            // functions
+        patterns.add("[+\\-*/()^]");            // operators
         patterns.add("mod");
+        patterns.addAll(functions.keySet());    // functions
 
         tokens = new ArrayList<>();
 
@@ -153,10 +153,12 @@ public class ExpressionEval {
                     return evaluateAST(operator.left) - evaluateAST(operator.right);
                 case "^":
                     return Math.pow(evaluateAST(operator.left), evaluateAST(operator.right));
-                case "totient":
-                    return mathOps.totient((int)evaluateAST(operator.left));
                 case "mod":
                     return mathOps.mod((int)evaluateAST(operator.left), (int)evaluateAST(operator.right));
+                case "totient":
+                    return mathOps.totient((int)evaluateAST(operator.left));
+                case "sqrt":
+                    return Math.sqrt((int)evaluateAST(operator.left));
                 default:
                     return 0.0;
             }

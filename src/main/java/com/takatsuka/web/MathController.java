@@ -41,7 +41,4 @@ public class MathController {
     public String totient(@RequestParam(name="num", required = true) int num){
         return Integer.toString(mathOps.totient(mathOps.primeFactors(num)));
     }
-
-//    @GetMapping(BASE_URL + "mod")
-//    public String totient(@RequestParam(name=""))
 }

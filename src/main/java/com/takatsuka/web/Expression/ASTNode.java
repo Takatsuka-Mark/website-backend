@@ -8,7 +8,8 @@ enum OperatorType {
     POW,
     MOD,
 
-    TOTIENT
+    TOTIENT,
+    SQRT;
 }
 
 enum NodeType {
