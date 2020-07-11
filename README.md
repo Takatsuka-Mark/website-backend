@@ -4,5 +4,5 @@ Check out my website at [markTakatsuka.com](https://markTakatsuka.com)
 
 
 ## Tech-Stack
-- Bazel
 - Springboot
+- Java 11
