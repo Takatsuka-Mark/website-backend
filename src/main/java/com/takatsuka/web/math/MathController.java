@@ -1,6 +1,6 @@
-package com.takatsuka.web;
+package com.takatsuka.web.math;
 
-import com.takatsuka.web.Expression.ExpressionEval;
+import com.takatsuka.web.math.Expression.ExpressionEval;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

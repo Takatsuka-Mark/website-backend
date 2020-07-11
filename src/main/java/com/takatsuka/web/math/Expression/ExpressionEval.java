@@ -1,6 +1,6 @@
-package com.takatsuka.web.Expression;
+package com.takatsuka.web.math.Expression;
 
-import com.takatsuka.web.MathOps;
+import com.takatsuka.web.math.MathOps;
 
 import java.util.ArrayList;
 import java.util.HashMap;

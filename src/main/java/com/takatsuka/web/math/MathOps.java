@@ -1,4 +1,4 @@
-package com.takatsuka.web;
+package com.takatsuka.web.math;
 
 import java.util.Hashtable;
 
