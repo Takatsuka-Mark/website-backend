@@ -20,7 +20,7 @@ public class MathController {
     }
 
     @GetMapping(BASE_URL + "evaluate")
-    public String evaluate(@RequestParam(name = "expression", required = true) String expression) {
+    public String evaluate(@RequestParam(name = "expression") String expression) {
         return mathService.evaluateExpression(expression);
     }
 }
