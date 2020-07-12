@@ -4,11 +4,9 @@ import com.takatsuka.web.Expression.ExpressionEval;
 
 
 public class MathService {
-    private MathOps mathOps;
     private ExpressionEval evaluator;
 
     MathService(){
-        this.mathOps = new MathOps();
         this.evaluator = new ExpressionEval();
     }
 
