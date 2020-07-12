@@ -1,0 +1,6 @@
+{
+  "title": "Totient",
+  "description": "Euler's phi function",
+  "pattern": "totient",
+  "method": "totient"
+}
