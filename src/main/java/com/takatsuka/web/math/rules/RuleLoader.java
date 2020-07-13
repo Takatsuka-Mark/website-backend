@@ -1,24 +1,35 @@
 package com.takatsuka.web.math.rules;
 
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.takatsuka.web.utils.FileUtils;
+import org.json.simple.JSONObject;
+import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
+@Component
 public class RuleLoader {
 
+    FileUtils fileUtils;
 
+    public RuleLoader(FileUtils fileUtils) {
+        this.fileUtils = fileUtils;
+    }
 
-    public void loadRules(){
-        String path = "./functions/totient.json";
+    @PostConstruct
+    public HashMap<String, JSONObject> loadRules(String folderPath, String pattern) {
+        // loading functions
+        List<File> files = fileUtils.getAllFilenames("./functions", "*.//json");
+        HashMap<String, JSONObject> loadedRules = new HashMap<>();
 
-        JSONParser parser = new JSONParser();
-        try {
-            Object obj = parser.parse(new FileReader(path));
-        } catch (ParseException | IOException e) {
-            e.printStackTrace();
+        for (File file : files) {
+            JSONObject object = fileUtils.readToJSON(file);
+            loadedRules.put(object.get("name").toString(), object);
         }
+
+        return loadedRules;
     }
 }
