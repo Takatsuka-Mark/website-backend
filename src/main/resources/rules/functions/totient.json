@@ -1,0 +1,11 @@
+{
+  "title": "Totient",
+  "description": "Euler's phi function",
+  "pattern": "totient",
+  "math_method": {
+    "class_name": "com.takatsuka.web.math.evaluators.MathOps",
+    "method_name": "totient",
+    "params": ["java.lang.Double"]
+  },
+  "is_right_associative": "false"
+}

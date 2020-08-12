@@ -1,4 +1,4 @@
-package com.takatsuka.web.math;
+package com.takatsuka.web.math.evaluators;
 
 import java.util.Hashtable;
 
@@ -41,7 +41,7 @@ public class MathOps {
         return num;
     }
 
-    public int totient(Hashtable<Integer, Integer> factors){
+    private int totient(Hashtable<Integer, Integer> factors){
         int totientAcc = 1;
         for(Integer factor: factors.keySet()){
             int exp = factors.get(factor);
@@ -50,15 +50,21 @@ public class MathOps {
         return totientAcc;
     }
 
-    public int totient(int num){
-        return totient(primeFactors(num));
+    public double totient(Double num){
+        return totient(primeFactors(num.intValue()));
     }
 
-    public int mod(int num, int base){
-        return num % base;
+
+    // TODO change this to ints only.
+    public double mod(Double num, Double base){
+        return num.intValue() % base.intValue();
     }
 
     public int modInverse(int num, int base){
         return 0;
+    }
+
+    public double sqrt(Double num) {
+        return Math.sqrt(num);
     }
 }

@@ -1,8 +1,9 @@
 package com.takatsuka.web.utils;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.protobuf.util.JsonFormat;
+import com.takatsuka.web.rules.Function;
+import com.takatsuka.web.rules.Operator;
+import com.takatsuka.web.rules.Rule;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -11,7 +12,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Component
 public class FileUtils {
@@ -28,16 +28,28 @@ public class FileUtils {
         return matchingFiles;
     }
 
-    public JSONObject readToJSON(File file) {
-        JSONParser parser = new JSONParser();
+    public Function readRuleFromJson(File file) {
         try {
-            Object obj = parser.parse(new FileReader(file));
+            Function.Builder ruleBuilder = Function.newBuilder();
+            JsonFormat.parser().merge(new FileReader(file), ruleBuilder);
 
-            return (JSONObject) obj;
-        } catch (ParseException | IOException e) {
+            return ruleBuilder.build();
+        } catch (IOException e) {  // TODO verify these are produced
             e.printStackTrace();
+            throw new RuntimeException("Unable to parse file to JSON", e);
         }
+    }
 
-        return null;
+    // TODO generify this.
+    public Operator readOperatorFromJson(File file) {
+        try {
+            Operator.Builder ruleBuilder = Operator.newBuilder();
+            JsonFormat.parser().merge(new FileReader(file), ruleBuilder);
+
+            return ruleBuilder.build();
+        } catch (IOException e) {  // TODO verify these are produced
+            e.printStackTrace();
+            throw new RuntimeException("Unable to parse file to JSON", e);
+        }
     }
 }
