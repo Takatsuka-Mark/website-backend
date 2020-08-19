@@ -1,11 +1,10 @@
-package com.takatsuka.web;
+package com.takatsuka.web.math;
 
+import com.takatsuka.web.MathService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.PostConstruct;
 
 @RestController
 @CrossOrigin
@@ -14,9 +13,8 @@ public class MathController {
     private MathService mathService;
     private final String BASE_URL = "/math/";
 
-    @PostConstruct
-    public void init() {
-        this.mathService = new MathService();
+    public MathController(MathService mathService) {
+        this.mathService = mathService;
     }
 
     @GetMapping(BASE_URL + "evaluate")

@@ -1,0 +1,11 @@
+{
+  "title": "Square Root",
+  "description": "Normal Square Root Function",
+  "pattern": "sqrt",
+  "math_method": {
+    "class_name": "com.takatsuka.web.math.evaluators.MathOps",
+    "method_name": "sqrt",
+    "params": ["java.lang.Double"]
+  },
+  "is_right_associative": "false"
+}

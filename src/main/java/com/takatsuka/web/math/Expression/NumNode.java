@@ -1,4 +1,4 @@
-package com.takatsuka.web.Expression;
+package com.takatsuka.web.math.Expression;
 
 public class NumNode extends ASTNode{
 

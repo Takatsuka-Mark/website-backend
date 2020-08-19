@@ -1,4 +1,4 @@
-package com.takatsuka.web.Expression;
+package com.takatsuka.web.math.Expression;
 
 import java.util.Queue;
 
@@ -13,9 +13,9 @@ public class AST{
         this.root = root;
     }
 
-
-
     public Queue<ASTNode> postOrder(){
         return null;
     }
+
+
 }
