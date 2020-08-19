@@ -20,6 +20,7 @@ public class MathService {
 
 
     MathService(RuleLoader ruleLoader) {
+        this.ruleLoader = ruleLoader;
         HashMap<String, Function> functions = ruleLoader.loadFunctions();
         HashMap<String, Operator> operators = ruleLoader.loadOperators();
         this.evaluator = new ExpressionEval(functions, operators);
