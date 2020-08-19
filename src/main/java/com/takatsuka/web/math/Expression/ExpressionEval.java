@@ -128,14 +128,14 @@ public class ExpressionEval {
         Arrays.toString(tokens.stream().map(token -> token.value).toArray()));
   }
 
-  private void addNode(Stack<ASTNode> stack, String operator) {
+  private void addOperatorNode(Stack<ASTNode> stack, String operator) {
     final ASTNode right = stack.pop();
     final ASTNode left = stack.pop();
     stack.push(new OperatorNode(left, right, operator));
   }
 
-  private void addFunctionNode(Stack<ASTNode> stack, String operator) {
-    stack.push(new OperatorNode(stack.pop(), null, operator));
+  private void addFunctionNode(Stack<ASTNode> stack, String function) {
+    stack.push(new FunctionNode(stack.pop(), function));
   }
 
   private ASTNode parseToAST() {
@@ -155,7 +155,7 @@ public class ExpressionEval {
             if ("(".equals(val)) {
               continue forLoop;
             } else {
-              addNode(valStack, val);
+              addOperatorNode(valStack, val);
             }
           }
           System.out.println("Unbalanced Parens");
@@ -169,7 +169,7 @@ public class ExpressionEval {
               if ((!op1.getIsRightAssociative() && 0 == comparePrecedence(op1, op2))
                   || comparePrecedence(op1, op2) < 0) {
                 opStack.pop();
-                addNode(valStack, op2.getTitle()); // TODO should store the symbol
+                addOperatorNode(valStack, op2.getTitle()); // TODO should store the symbol
               } else {
                 break;
               }
@@ -183,7 +183,6 @@ public class ExpressionEval {
               opStack.pop();
               addFunctionNode(valStack, func.getPattern()); // TODO should store the symbol
             }
-            opStack.push(val);
           } else {
             valStack.push(new NumNode(val));
           }
@@ -192,7 +191,7 @@ public class ExpressionEval {
     while (!opStack.isEmpty()) {
       String op = opStack.pop();
       if (operators.containsKey(op)) {
-        addNode(valStack, op);
+        addOperatorNode(valStack, op);
       } else {
         addFunctionNode(valStack, op);
       }
@@ -217,27 +216,30 @@ public class ExpressionEval {
           return evaluateAST(operator.left) - evaluateAST(operator.right);
         case "^":
           return Math.pow(evaluateAST(operator.left), evaluateAST(operator.right));
-          //        case "mod":
-          //          return mathOps.mod((int) evaluateAST(operator.left), (int)
-          // evaluateAST(operator.right));
         default:
-          if (functions.containsKey(operator.operator)) {
-            return runFunction(operator);
-          } else if (operators.containsKey(operator.operator)) {
+          if (operators.containsKey(operator.operator)) {
             return runOperator(operator);
           }
-
           // final default.
           return 0.0;
       }
-    } else {
+    } else if(root.getNodeType() == NodeType.FUNCTION){
+      FunctionNode function = (FunctionNode) root;
+      logger.info("Evaluating on function: '{}'", function.function);
+      if (functions.containsKey(function.function)) {
+        return runFunction(function);
+      } else {
+        throw new RuntimeException("Function not found");
+      }
+    }
+    else {
       NumNode num = (NumNode) root;
       return Double.parseDouble(num.value);
     }
   }
 
-  private double runFunction(OperatorNode operator) {
-    Function rule = functions.get(operator.operator);
+  private double runFunction(FunctionNode function) {
+    Function rule = functions.get(function.function);
     Math_Method math_method = rule.getMathMethod();
     try {
       // TODO we shouldn't get this every time we run a function, to decrease latency.
@@ -245,10 +247,10 @@ public class ExpressionEval {
       Class<?> param0 = Class.forName(math_method.getParams(0));
       if (math_method.getClassName().endsWith("MathOps")) {
         Method method = mathOps.getClass().getMethod(math_method.getMethodName(), param0);
-        return (double) method.invoke(mathOps, evaluateAST(operator.left));
+        return (double) method.invoke(mathOps, evaluateAST(function.value));
       } else if (math_method.getClassName().endsWith("Constants")) {
         Method method = constants.getClass().getMethod(math_method.getMethodName(), param0);
-        return (double) method.invoke(constants, evaluateAST(operator.left));
+        return (double) method.invoke(constants, evaluateAST(function.value));
       }
     } catch (IllegalAccessException
         | InvocationTargetException
