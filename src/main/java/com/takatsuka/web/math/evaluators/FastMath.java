@@ -7,7 +7,7 @@ public class FastMath {
 
     }
 
-    public void FFTMultiply(BigInteger factor1, BigInteger factor2){
-
+    public BigInteger FFTMultiply(BigInteger factor1, BigInteger factor2){
+        return null;
     }
 }
