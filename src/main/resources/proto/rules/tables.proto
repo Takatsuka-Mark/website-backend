@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+option java_package = "com.takatsuka.web.interpreter";
+option java_multiple_files = true;
+
+// P.20
+message VariableTable {
+    int32 id = 1;
+
+    int32 variable = 2;
+}
+
+// P.21
+message ExpressionTable {
+    int32 id = 1;
+
+    FunctionType function = 2;
+
+    int32 max_arg = 3;
+
+    repeated Arg args = 4;
+
+    int32 arg_of = 5;
+
+    int32 ind_arg = 6;
+
+    bytes value = 7;
+
+    int32 level = 8;
+
+    int32 offset = 9;
+
+    int32 seq = 10;
+}
+
+message Arg {
+    int32 id = 1;
+
+    string arg_name = 2;
+
+    bytes arg_value = 3;
+}
+
+enum FunctionType {
+    ADD = 0;
+    SUBTRACT = 1;
+    MULTIPLY = 2;
+    DIVISION = 3;
+    INT_DIVIDE = 4;
+    MOD = 5;
+    POWER = 6;
+    FACTORIAL = 7;
+    ABSOLUTE = 8;
+    SINE = 9;
+    COSINE = 10;
+
+}

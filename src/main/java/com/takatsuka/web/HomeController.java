@@ -7,8 +7,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin
 public class HomeController {
-    @GetMapping("/")
-    public String home(){
-        return "Hello from Spring Boot";
+//    @GetMapping("/")
+//    public String home(){
+//        return "Hello from Spring Boot";
+//    }
+    @GetMapping("/isUp")
+    public String isUp() {
+        return "Yes!";
     }
 }
