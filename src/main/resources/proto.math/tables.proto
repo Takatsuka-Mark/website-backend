@@ -14,7 +14,7 @@ message VariableTable {
 message ExpressionTable {
     int32 id = 1;
 
-    FunctionType function = 2;
+    Function function = 2;
 
     int32 max_arg = 3;
 
@@ -41,17 +41,17 @@ message Arg {
     bytes arg_value = 3;
 }
 
-enum FunctionType {
+enum Function {
     ADD = 0;
     SUBTRACT = 1;
     MULTIPLY = 2;
-    DIVISION = 3;
+    DIVIDE = 3;
     INT_DIVIDE = 4;
     MOD = 5;
     POWER = 6;
     FACTORIAL = 7;
-    ABSOLUTE = 8;
+    ABSOLUTE_VALUE = 8;
     SINE = 9;
     COSINE = 10;
-
+    SQUARE_ROOT = 11;
 }
