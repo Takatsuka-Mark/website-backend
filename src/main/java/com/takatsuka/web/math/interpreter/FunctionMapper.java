@@ -17,6 +17,16 @@ public class FunctionMapper {
   private static final String SymbolGroups = "[+\\-*/%^!()]";
   private static final String numRegex = "-?\\d+(.\\d+)?";
 
+  public static Function mapStringToFunction(String token){
+    if(SYMBOL_FUNCTION_MAP.containsKey(token)){
+      return SYMBOL_FUNCTION_MAP.get(token);
+    }
+    if(SYMBOL_OPERATOR_MAP.containsKey(token)){
+      return SYMBOL_OPERATOR_MAP.get(token);
+    }
+    return null;
+  }
+
   // TODO(mark) Support non-spaced expressions
   private static Map<String, Function> generateSymbolFunctionMap() {
     HashMap<String, Function> tmp = new HashMap<>();
@@ -34,7 +44,6 @@ public class FunctionMapper {
     tmp.put("*", Function.MULTIPLY);
     tmp.put("/", Function.DIVIDE);
     tmp.put("%", Function.MOD);
-    tmp.put("^", Function.POWER);
     tmp.put("!", Function.FACTORIAL);
     return tmp;
   }
@@ -53,5 +62,9 @@ public class FunctionMapper {
     patterns.addAll(SYMBOL_FUNCTION_MAP.keySet());
 
     return Pattern.compile(String.join("|", patterns));
+  }
+
+  public static String getNumRegex() {
+    return numRegex;
   }
 }
