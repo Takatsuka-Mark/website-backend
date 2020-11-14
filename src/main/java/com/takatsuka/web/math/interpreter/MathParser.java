@@ -1,12 +1,11 @@
 package com.takatsuka.web.math.interpreter;
 
-import com.takatsuka.web.interpreter.Arg;
 import com.takatsuka.web.interpreter.ExpressionEntry;
 import com.takatsuka.web.interpreter.Function;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,14 +18,13 @@ import java.util.regex.Pattern;
 @Component
 public class MathParser {
 
-  private Pattern regex = FunctionMapper.getPattern();
+  private final Pattern regex = FunctionMapper.getPattern();
 
   public MathParser() {}
 
   public double evaluate(String expression) {
     ArrayList<String> tokens = tokenize(expression);
-//    Map<Integer, ExpressionEntry> expressionTable1 = loadTokensIntoTables(tokens);
-    Map<Integer, ExpressionEntry> expressionTable1 = loadTokensIntoTables2(tokens);
+    Map<Integer, ExpressionEntry> expressionTable1 = loadTokensIntoTables(tokens);
     Map<Integer, ExpressionEntry> expressionTable2 = fillSecondArguments(expressionTable1);
     Map<Integer, ExpressionEntry> expressionTable3 = buildRelations(expressionTable2);
     List<Integer> sequenceList = buildSequenceIndexList(expressionTable3);
@@ -46,23 +44,45 @@ public class MathParser {
     return tokens;
   }
 
-  /** Step 1.0.2 */
-  public Map<Integer, ExpressionEntry> loadTokensIntoTables2(List<String> tokens) {
-    return null;
+  public Map<Integer, ExpressionEntry> loadTokensIntoTables(List<String> tokens) {
+    return loadTokensIntoTables(tokens, 0, 0);
   }
 
   /** Step 1.0 */
-  public Map<Integer, ExpressionEntry> loadTokensIntoTables(List<String> tokens) {
+  private Map<Integer, ExpressionEntry> loadTokensIntoTables(
+      List<String> tokens, int currentFuncId, int currentPriority) {
     Queue<String> argBackup = new LinkedList<>();
     HashMap<Integer, ExpressionEntry> expressionTable = new HashMap<>();
-    int argPriority = 0;
-    int funcId = 0;
-    int tokenNum = 0;
+    int argPriority = currentPriority;
+    int funcId = currentFuncId;
+    int outstandingParams = 0;
 
-    for (String token : tokens) {
-      tokenNum += 1;
+    for (int i = 0; i < tokens.size(); i++) {
+      String token = tokens.get(i);
       if (token.matches("[(]")) {
-        argPriority += 10;
+        if (outstandingParams > 0) {
+          int requiredClosingParen = 0;
+          // Fetch the next tokens which need to be processed
+          List<String> secondaryTokens = new ArrayList<>();
+          do {
+            secondaryTokens.add(tokens.get(i));
+            if (tokens.get(i).matches("[(]")) requiredClosingParen += 1;
+            if (tokens.get(i).matches("[)]")) requiredClosingParen -= 1;
+            i += 1;
+          } while (requiredClosingParen > 0);
+
+          // Get the new interior map.
+          Map<Integer, ExpressionEntry> interiorMap =
+              loadTokensIntoTables(secondaryTokens, funcId, currentPriority);
+          // TODO(mark) Need to make sure to support that a function like sqrt(5) will process. RN,
+          // 5 doesn't process to anything.
+          funcId = Collections.max(interiorMap.keySet());
+
+          // Merge the interior map to the existing map.
+          expressionTable.putAll(interiorMap);
+        } else {
+          argPriority += 10;
+        }
       } else if (token.matches("[)]")) {
         argPriority -= 10;
       } else {
@@ -72,7 +92,7 @@ public class MathParser {
           // It is a number.
           argBackup.add(token);
         } else {
-          // it is a function.
+          // It is some sort of function.
           funcId += 1;
           int level;
           Function function = FunctionMapper.mapStringToFunction(token);
@@ -94,12 +114,24 @@ public class MathParser {
           }
 
           ExpressionEntry.Builder expressionBuilder = ExpressionEntry.newBuilder();
-          expressionBuilder.setId(funcId);
-          expressionBuilder.setFunction(function);
-          expressionBuilder.setMaxArg(FunctionMapper.mapFunctionToMaxArgs(function));
-          expressionBuilder.addArgs(
-              Arg.newBuilder().setArgValue(new BigDecimal(argBackup.remove()).toString()));
-          expressionBuilder.setLevel(level + argPriority);
+          expressionBuilder
+              .setId(funcId)
+              .setLevel(level + argPriority)
+              .setFunction(function)
+              .setMaxArg(FunctionMapper.mapFunctionToMaxArgs(function));
+
+          // We shouldn't have to make this call to FunctionMapper twice.
+          if (FunctionMapper.isSymbolFunction(token)) {
+            // This is of the form ' a [function] b '
+            expressionBuilder.addArgs(argBackup.remove()); // Get the previous arg
+            expressionBuilder.addArgs("0");
+          } else if (FunctionMapper.isMonoVariableFunction(token)) {
+            // This is of the form ' [function]( a ) '
+            outstandingParams += FunctionMapper.mapFunctionToMaxArgs(function);
+            expressionBuilder.addArgs("0");
+            expressionBuilder.addArgs("0");
+          }
+
           expressionTable.put(funcId, expressionBuilder.build());
         }
       }
@@ -107,16 +139,14 @@ public class MathParser {
 
     // Make sure we don't bypass the final value.
     if (!argBackup.isEmpty()) {
-      int idx = expressionTable.size();
+      int idx = Collections.max(expressionTable.keySet());
       expressionTable.replace(
           idx,
           expressionTable.get(idx).toBuilder()
-              .addArgs(
-                  Arg.newBuilder()
-                      .setArgValue(new BigDecimal(argBackup.remove()).toString())
-                      .build())
+              .setArgs(expressionTable.get(idx).getMaxArg() - 1, argBackup.remove())
               .build());
     }
+
     return expressionTable;
   }
 
@@ -128,8 +158,12 @@ public class MathParser {
 
     int size = expressions.size();
     for (int i = 1; i < size; i++) {
-      Arg newArg = expressions.get(i + 1).getArgs(0);
-      resultMap.put(i, expressions.get(i).toBuilder().addArgs(newArg).build());
+      String newArg = expressions.get(i + 1).getArgs(0);
+      if (FunctionMapper.isSymbolFunction(expressions.get(i).getFunction())) {
+        resultMap.put(i, expressions.get(i).toBuilder().setArgs(1, newArg).build());
+      } else {
+        resultMap.put(i, expressions.get(i));
+      }
     }
     resultMap.put(size, expressions.get(size));
 
@@ -224,41 +258,30 @@ public class MathParser {
 
       if (argOf != 0) {
         ExpressionEntry expressionToUpdate = expressions.get(argOf);
-        List<Arg> argsToUpdate = expressionToUpdate.getArgsList();
+        List<String> argsToUpdate = expressionToUpdate.getArgsList();
         // Work with the ID - 1 because the id is indexed at 1.
         expressions.put(
             argOf,
-            expressionToUpdate.toBuilder()
-                .setArgs(
-                    argId - 1,
-                    argsToUpdate.get(argId - 1).toBuilder()
-                        .setArgValue(String.valueOf(result))
-                        .build())
-                .build());
+            expressionToUpdate.toBuilder().setArgs(argId - 1, String.valueOf(finalValue)).build());
       }
     }
     return finalValue;
   }
 
-  public double evaluateFunction(Function function, List<Arg> args) {
+  public double evaluateFunction(Function function, List<String> args) {
     switch (function) {
       case ADD:
-        return Double.parseDouble(args.get(0).getArgValue())
-            + Double.parseDouble(args.get(1).getArgValue());
+        return Double.parseDouble(args.get(0)) + Double.parseDouble(args.get(1));
       case SUBTRACT:
-        return Double.parseDouble(args.get(0).getArgValue())
-            - Double.parseDouble(args.get(1).getArgValue());
+        return Double.parseDouble(args.get(0)) - Double.parseDouble(args.get(1));
       case MULTIPLY:
-        return Double.parseDouble(args.get(0).getArgValue())
-            * Double.parseDouble(args.get(1).getArgValue());
+        return Double.parseDouble(args.get(0)) * Double.parseDouble(args.get(1));
       case DIVIDE:
-        return Double.parseDouble(args.get(0).getArgValue())
-            / Double.parseDouble(args.get(1).getArgValue());
+        return Double.parseDouble(args.get(0)) / Double.parseDouble(args.get(1));
       case MOD:
-        return Double.parseDouble(args.get(0).getArgValue())
-            % Double.parseDouble(args.get(1).getArgValue());
+        return Double.parseDouble(args.get(0)) % Double.parseDouble(args.get(1));
       case SQUARE_ROOT:
-        return Math.sqrt(Double.parseDouble(args.get(0).getArgValue()));
+        return Math.sqrt(Double.parseDouble(args.get(0)));
     }
     return 0.0D;
   }

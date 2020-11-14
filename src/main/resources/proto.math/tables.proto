@@ -18,7 +18,7 @@ message ExpressionEntry {
 
     int32 max_arg = 3;
 
-    repeated Arg args = 4;
+    repeated string args = 4;
 
     int32 arg_of = 5;
 
