@@ -28,46 +28,50 @@ public class RuleLoader {
   }
 
   public HashMap<String, Function> loadFunctions() {
-    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-    List<File> files =
-        new Reflections("rules.functions", new ResourcesScanner())
-            .getResources(Pattern.compile(".*\\.json")).stream()
-                .map(resource -> new File(classLoader.getResource(resource).getFile()))
-                .collect(Collectors.toList());
-
-    logger.info("Found '{}' rules to load: {}", files.size(), Arrays.toString(files.toArray()));
-
-    // map of the rule regex to the JSONObject.
-    HashMap<String, Function> loadedRules = new HashMap<>();
-
-    for (File file : files) {
-      Function rule = fileUtils.readRuleFromJson(file);
-      loadedRules.put(rule.getPattern(), rule);
-    }
-
-    return loadedRules;
+    //    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    //
+    //    List<File> files =
+    //        new Reflections("rules.functions", new ResourcesScanner())
+    //            .getResources(Pattern.compile(".*\\.json")).stream()
+    //                .map(resource -> new File(classLoader.getResource(resource).getFile()))
+    //                .collect(Collectors.toList());
+    //
+    //    logger.info("Found '{}' rules to load: {}", files.size(),
+    // Arrays.toString(files.toArray()));
+    //
+    //    // map of the rule regex to the JSONObject.
+    //    HashMap<String, Function> loadedRules = new HashMap<>();
+    //
+    //    for (File file : files) {
+    //      Function rule = fileUtils.readRuleFromJson(file);
+    //      loadedRules.put(rule.getPattern(), rule);
+    //    }
+    //
+    //    return loadedRules;
+    return null;
   }
 
   public HashMap<String, Operator> loadOperators() {
-    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-    List<File> files =
-            new Reflections("rules.operators", new ResourcesScanner())
-                    .getResources(Pattern.compile(".*\\.json")).stream()
-                    .map(resource -> new File(classLoader.getResource(resource).getFile()))
-                    .collect(Collectors.toList());
-
-    logger.info("Found '{}' operators to load: {}", files.size(), Arrays.toString(files.toArray()));
-
-    // map of the rule regex to the JSONObject.
-    HashMap<String, Operator> loadedRules = new HashMap<>();
-
-    for (File file : files) {
-      Operator rule = fileUtils.readOperatorFromJson(file);
-      loadedRules.put(rule.getPattern(), rule);
-    }
-
-    return loadedRules;
+    //    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    //
+    //    List<File> files =
+    //            new Reflections("rules.operators", new ResourcesScanner())
+    //                    .getResources(Pattern.compile(".*\\.json")).stream()
+    //                    .map(resource -> new File(classLoader.getResource(resource).getFile()))
+    //                    .collect(Collectors.toList());
+    //
+    //    logger.info("Found '{}' operators to load: {}", files.size(),
+    // Arrays.toString(files.toArray()));
+    //
+    //    // map of the rule regex to the JSONObject.
+    //    HashMap<String, Operator> loadedRules = new HashMap<>();
+    //
+    //    for (File file : files) {
+    //      Operator rule = fileUtils.readOperatorFromJson(file);
+    //      loadedRules.put(rule.getPattern(), rule);
+    //    }
+    //
+    //    return loadedRules;
+    return null;
   }
 }

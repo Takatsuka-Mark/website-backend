@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+option java_package = "com.takatsuka.web.interpreter";
+option java_multiple_files = true;
+
+// P.20
+message VariableEntry {
+    int32 id = 1;
+
+    int32 variable = 2;
+}
+
+// P.21
+message ExpressionEntry {
+    int32 id = 1;
+
+    Function function = 2;
+
+    int32 max_arg = 3;
+
+    repeated Arg args = 4;
+
+    int32 arg_of = 5;
+
+    int32 arg_id = 6;
+
+    string value = 7;
+
+    int32 level = 8;
+
+    int32 offset = 9;
+
+    // Note: This is shown on page 25 to be the row to execute in order by key.
+    // However, we set it as the execution # for this row
+    int32 sequence_index = 10;
+}
+
+message Arg {
+    int32 id = 1;
+
+    string arg_name = 2;
+
+    string arg_value = 3;
+}
+
+enum Function {
+    ADD = 0;
+    SUBTRACT = 1;
+    MULTIPLY = 2;
+    DIVIDE = 3;
+    INT_DIVIDE = 4;
+    MOD = 5;
+    POWER = 6;
+    FACTORIAL = 7;
+    ABSOLUTE_VALUE = 8;
+    SINE = 9;
+    COSINE = 10;
+    SQUARE_ROOT = 11;
+}
