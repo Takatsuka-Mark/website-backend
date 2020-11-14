@@ -13,18 +13,24 @@ public class FunctionMapper {
 
   private static final Map<String, Function> SYMBOL_FUNCTION_MAP = generateSymbolFunctionMap();
   private static final Map<String, Function> SYMBOL_OPERATOR_MAP = generateSymbolOperatorMap();
+  private static final Map<Function, Integer> FUNCTION_TO_MAX_ARG_MAP =
+      generateFunctionToMaxArgsMap();
 
   private static final String SymbolGroups = "[+\\-*/%^!()]";
   private static final String numRegex = "-?\\d+(.\\d+)?";
 
-  public static Function mapStringToFunction(String token){
-    if(SYMBOL_FUNCTION_MAP.containsKey(token)){
+  public static Function mapStringToFunction(String token) {
+    if (SYMBOL_FUNCTION_MAP.containsKey(token)) {
       return SYMBOL_FUNCTION_MAP.get(token);
     }
-    if(SYMBOL_OPERATOR_MAP.containsKey(token)){
+    if (SYMBOL_OPERATOR_MAP.containsKey(token)) {
       return SYMBOL_OPERATOR_MAP.get(token);
     }
     return null;
+  }
+
+  public static int mapFunctionToMaxArgs(Function function) {
+    return FUNCTION_TO_MAX_ARG_MAP.get(function);
   }
 
   // TODO(mark) Support non-spaced expressions
@@ -66,5 +72,22 @@ public class FunctionMapper {
 
   public static String getNumRegex() {
     return numRegex;
+  }
+
+  public static Map<Function, Integer> generateFunctionToMaxArgsMap() {
+    HashMap<Function, Integer> tmp = new HashMap<>();
+    tmp.put(Function.ADD, 2);
+    tmp.put(Function.SUBTRACT, 2);
+    tmp.put(Function.MULTIPLY, 2);
+    tmp.put(Function.DIVIDE, 2);
+    tmp.put(Function.INT_DIVIDE, 2);
+    tmp.put(Function.MOD, 2);
+    tmp.put(Function.POWER, 2);
+    tmp.put(Function.FACTORIAL, 1);
+    tmp.put(Function.ABSOLUTE_VALUE, 1);
+    tmp.put(Function.SINE, 1);
+    tmp.put(Function.COSINE, 1);
+    tmp.put(Function.SQUARE_ROOT, 1);
+    return tmp;
   }
 }

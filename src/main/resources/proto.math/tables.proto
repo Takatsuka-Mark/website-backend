@@ -30,7 +30,9 @@ message ExpressionEntry {
 
     int32 offset = 9;
 
-    int32 seq = 10;
+    // Note: This is shown on page 25 to be the row to execute in order by key.
+    // However, we set it as the execution # for this row
+    int32 sequence_index = 10;
 }
 
 message Arg {

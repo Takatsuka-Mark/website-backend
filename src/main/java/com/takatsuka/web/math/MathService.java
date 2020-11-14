@@ -30,7 +30,6 @@ public class MathService {
 
     public String evaluateExpression(String expression) {
         logger.trace("Evaluating expression '{}'", expression);
-        ArrayList<String> tokens = mathParser.tokenize(expression);
-        return "Hit em with a tokenize: " + Arrays.toString(tokens.toArray());
+        return "Big O'l Eval time: " + mathParser.evaluate(expression);
     }
 }
