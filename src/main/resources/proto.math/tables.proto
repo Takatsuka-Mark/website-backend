@@ -44,16 +44,17 @@ message Arg {
 }
 
 enum Function {
-    ADD = 0;
-    SUBTRACT = 1;
-    MULTIPLY = 2;
-    DIVIDE = 3;
-    INT_DIVIDE = 4;
-    MOD = 5;
-    POWER = 6;
-    FACTORIAL = 7;
-    ABSOLUTE_VALUE = 8;
-    SINE = 9;
-    COSINE = 10;
-    SQUARE_ROOT = 11;
+    UNKNOWN_FUNCTION = 0;
+    ADD = 1;
+    SUBTRACT = 2;
+    MULTIPLY = 3;
+    DIVIDE = 4;
+    INT_DIVIDE = 5;
+    MOD = 6;
+    POWER = 7;
+    FACTORIAL = 8;
+    ABSOLUTE_VALUE = 9;
+    SINE = 10;
+    COSINE = 11;
+    SQUARE_ROOT = 12;
 }

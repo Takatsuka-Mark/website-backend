@@ -2,6 +2,9 @@ package com.takatsuka.web.math.interpreter;
 
 import com.takatsuka.web.interpreter.ExpressionEntry;
 import com.takatsuka.web.interpreter.Function;
+import com.takatsuka.web.logging.MathLogger;
+import org.apache.el.lang.ExpressionBuilder;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,6 +20,7 @@ import java.util.regex.Pattern;
 
 @Component
 public class MathParser {
+  private static final Logger logger = MathLogger.forCallingClass();
 
   private final Pattern regex = FunctionMapper.getPattern();
 
@@ -65,21 +69,18 @@ public class MathParser {
           // Fetch the next tokens which need to be processed
           List<String> secondaryTokens = new ArrayList<>();
           do {
-            secondaryTokens.add(tokens.get(i));
-            if (tokens.get(i).matches("[(]")) requiredClosingParen += 1;
-            if (tokens.get(i).matches("[)]")) requiredClosingParen -= 1;
+            String secondaryToken = tokens.get(i);
+            secondaryTokens.add(secondaryToken);
+            if (secondaryToken.matches("[(]")) requiredClosingParen += 1;
+            if (secondaryToken.matches("[)]")) requiredClosingParen -= 1;
             i += 1;
           } while (requiredClosingParen > 0);
+          i -= 1;
 
-          // Get the new interior map.
-          Map<Integer, ExpressionEntry> interiorMap =
-              loadTokensIntoTables(secondaryTokens, funcId, currentPriority);
-          // TODO(mark) Need to make sure to support that a function like sqrt(5) will process. RN,
-          // 5 doesn't process to anything.
-          funcId = Collections.max(interiorMap.keySet());
-
-          // Merge the interior map to the existing map.
-          expressionTable.putAll(interiorMap);
+          // TODO should not join, but start already tokenized.
+          String result = String.valueOf(evaluate(String.join(" ", secondaryTokens)));
+          expressionTable.put(
+              funcId, expressionTable.get(funcId).toBuilder().setArgs(0, result).build());
         } else {
           argPriority += 10;
         }
@@ -123,12 +124,15 @@ public class MathParser {
           // We shouldn't have to make this call to FunctionMapper twice.
           if (FunctionMapper.isSymbolFunction(token)) {
             // This is of the form ' a [function] b '
-            expressionBuilder.addArgs(argBackup.remove()); // Get the previous arg
+            if (!argBackup.isEmpty()) {
+              expressionBuilder.addArgs(argBackup.remove()); // Get the previous arg
+            } else {
+              expressionBuilder.addArgs("0");
+            }
             expressionBuilder.addArgs("0");
           } else if (FunctionMapper.isMonoVariableFunction(token)) {
             // This is of the form ' [function]( a ) '
             outstandingParams += FunctionMapper.mapFunctionToMaxArgs(function);
-            expressionBuilder.addArgs("0");
             expressionBuilder.addArgs("0");
           }
 
@@ -139,12 +143,29 @@ public class MathParser {
 
     // Make sure we don't bypass the final value.
     if (!argBackup.isEmpty()) {
-      int idx = Collections.max(expressionTable.keySet());
-      expressionTable.replace(
-          idx,
-          expressionTable.get(idx).toBuilder()
-              .setArgs(expressionTable.get(idx).getMaxArg() - 1, argBackup.remove())
-              .build());
+      if (expressionTable.size() > 0) {
+        // There must be a previous function
+
+        int idx = Collections.max(expressionTable.keySet());
+        expressionTable.replace(
+            idx,
+            expressionTable.get(idx).toBuilder()
+                .setArgs(expressionTable.get(idx).getMaxArg() - 1, argBackup.remove())
+                .build());
+      } else {
+        // This is the only variable represented.
+        // TODO do this a different way
+        funcId += 1;
+        ExpressionEntry.Builder expressionBuilder = ExpressionEntry.newBuilder();
+        expressionBuilder.setId(funcId);
+        expressionBuilder.setLevel(argPriority + 1);
+        expressionBuilder.addArgs(argBackup.remove());
+        //        expressionBuilder.setFunction(Function.ADD);
+        //        expressionBuilder.addArgs("0");
+        //        expressionBuilder.setMaxArg(2);
+        expressionBuilder.setMaxArg(1);
+        expressionTable.put(funcId, expressionBuilder.build());
+      }
     }
 
     return expressionTable;
@@ -216,7 +237,7 @@ public class MathParser {
 
       // Add this relation to the relation map, and remove it from the remainingMap
       if (biggestEntry.getId() < thisEntry.getId()) {
-        argId = thisEntry.getMaxArg();
+        argId = biggestEntry.getMaxArg();
       }
       relationMap.put(
           thisLevel, thisEntry.toBuilder().setArgOf(biggestEntry.getId()).setArgId(argId).build());
@@ -250,9 +271,7 @@ public class MathParser {
     double finalValue = 0.0D;
     for (Integer index : sequence) {
       ExpressionEntry expressionEntry = expressions.get(index);
-      double result =
-          evaluateFunction(expressionEntry.getFunction(), expressionEntry.getArgsList());
-      finalValue = result;
+      finalValue = evaluateFunction(expressionEntry.getFunction(), expressionEntry.getArgsList());
       int argOf = expressionEntry.getArgOf();
       int argId = expressionEntry.getArgId();
 
@@ -270,6 +289,11 @@ public class MathParser {
 
   public double evaluateFunction(Function function, List<String> args) {
     switch (function) {
+      case UNKNOWN_FUNCTION:
+        // The function is unknown, just return the args if available.
+        return Double.parseDouble(args.get(0));
+
+        // Symbol Functions (Excluding FAC)
       case ADD:
         return Double.parseDouble(args.get(0)) + Double.parseDouble(args.get(1));
       case SUBTRACT:
@@ -280,8 +304,16 @@ public class MathParser {
         return Double.parseDouble(args.get(0)) / Double.parseDouble(args.get(1));
       case MOD:
         return Double.parseDouble(args.get(0)) % Double.parseDouble(args.get(1));
+
+        // Mono Variable Functions (Excluding FAC);
+      case ABSOLUTE_VALUE:
+        return Math.abs(Double.parseDouble(args.get(0)));
       case SQUARE_ROOT:
         return Math.sqrt(Double.parseDouble(args.get(0)));
+      case SINE:
+        return Math.sin(Double.parseDouble(args.get(0)));
+      case COSINE:
+        return Math.cos(Double.parseDouble(args.get(0)));
     }
     return 0.0D;
   }
