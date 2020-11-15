@@ -28,6 +28,11 @@ public class MathParserTest {
   }
 
   @Test
+  public void testEvaluate_negative() {
+    Truth.assertThat(mathParser.evaluate("-1")).isEqualTo(-1.0);
+  }
+
+  @Test
   public void testEvaluate_simple() {
     Truth.assertThat(mathParser.evaluate(SIMPLE_EXPRESSION)).isEqualTo(3.0);
   }

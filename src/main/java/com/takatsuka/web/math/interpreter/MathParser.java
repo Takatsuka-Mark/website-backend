@@ -28,6 +28,10 @@ public class MathParser {
 
   public double evaluate(String expression) {
     ArrayList<String> tokens = tokenize(expression);
+    return evaluate(tokens);
+  }
+
+  private double evaluate(List<String> tokens) {
     Map<Integer, ExpressionEntry> expressionTable1 = loadTokensIntoTables(tokens);
     Map<Integer, ExpressionEntry> expressionTable2 = fillSecondArguments(expressionTable1);
     Map<Integer, ExpressionEntry> expressionTable3 = buildRelations(expressionTable2);
@@ -76,9 +80,8 @@ public class MathParser {
             i += 1;
           } while (requiredClosingParen > 0);
           i -= 1;
-
-          // TODO should not join, but start already tokenized.
-          String result = String.valueOf(evaluate(String.join(" ", secondaryTokens)));
+          
+          String result = String.valueOf(evaluate(secondaryTokens));
           expressionTable.put(
               funcId, expressionTable.get(funcId).toBuilder().setArgs(0, result).build());
         } else {
@@ -271,7 +274,8 @@ public class MathParser {
     double finalValue = 0.0D;
     for (Integer index : sequence) {
       ExpressionEntry expressionEntry = expressions.get(index);
-      finalValue = evaluateFunction(expressionEntry.getFunction(), expressionEntry.getArgsList());
+      finalValue =
+          Evaluator.evaluateFunction(expressionEntry.getFunction(), expressionEntry.getArgsList());
       int argOf = expressionEntry.getArgOf();
       int argId = expressionEntry.getArgId();
 
@@ -285,37 +289,6 @@ public class MathParser {
       }
     }
     return finalValue;
-  }
-
-  public double evaluateFunction(Function function, List<String> args) {
-    switch (function) {
-      case UNKNOWN_FUNCTION:
-        // The function is unknown, just return the args if available.
-        return Double.parseDouble(args.get(0));
-
-        // Symbol Functions (Excluding FAC)
-      case ADD:
-        return Double.parseDouble(args.get(0)) + Double.parseDouble(args.get(1));
-      case SUBTRACT:
-        return Double.parseDouble(args.get(0)) - Double.parseDouble(args.get(1));
-      case MULTIPLY:
-        return Double.parseDouble(args.get(0)) * Double.parseDouble(args.get(1));
-      case DIVIDE:
-        return Double.parseDouble(args.get(0)) / Double.parseDouble(args.get(1));
-      case MOD:
-        return Double.parseDouble(args.get(0)) % Double.parseDouble(args.get(1));
-
-        // Mono Variable Functions (Excluding FAC);
-      case ABSOLUTE_VALUE:
-        return Math.abs(Double.parseDouble(args.get(0)));
-      case SQUARE_ROOT:
-        return Math.sqrt(Double.parseDouble(args.get(0)));
-      case SINE:
-        return Math.sin(Double.parseDouble(args.get(0)));
-      case COSINE:
-        return Math.cos(Double.parseDouble(args.get(0)));
-    }
-    return 0.0D;
   }
 
   private int countArgOf0(Map<Integer, ExpressionEntry> expressions) {

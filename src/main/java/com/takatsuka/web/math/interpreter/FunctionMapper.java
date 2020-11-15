@@ -17,8 +17,8 @@ public class FunctionMapper {
   private static final Map<Function, Integer> FUNCTION_TO_MAX_ARG_MAP =
       generateFunctionToMaxArgsMap();
 
-  private static final String SymbolGroups = "[+\\-*/%^!()]";
-  private static final String numRegex = "-?\\d+(.\\d+)?";
+  private static final String SymbolGroups = "([+\\-*/%^!()])";
+  private static final String numRegex = "(-?\\d+(.\\d+)?)";
 
   public static Function mapStringToFunction(String token) {
     if (MONO_VARIABLE_FUNCTION_MAP.containsKey(token)) {
