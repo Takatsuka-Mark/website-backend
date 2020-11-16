@@ -58,4 +58,5 @@ enum Function {
     COSINE = 11;
     SQUARE_ROOT = 12;
     MAX = 13;
+    PROBABILITY_CHOOSE = 14;
 }

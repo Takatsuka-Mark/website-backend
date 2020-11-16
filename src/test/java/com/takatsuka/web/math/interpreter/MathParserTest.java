@@ -26,6 +26,7 @@ public class MathParserTest {
 
   @Test
   public void testEvaluate_single() {
+    // TODO(mark): '1)' fails, but '1' does not.
     Truth.assertThat(mathParser.evaluate("1")).isEqualTo(1.0);
   }
 
@@ -46,7 +47,7 @@ public class MathParserTest {
   }
 
   @Test
-  public void testEvaluate_multiVariable() {
+  public void testEvaluate_multiVariable_max2() {
     Truth.assertThat(mathParser.evaluate(MULTI_VARIABLE_EXPRESSION)).isEqualTo(10.0);
   }
 
@@ -167,8 +168,7 @@ public class MathParserTest {
     Map<Integer, ExpressionEntry> filledSecondArguments = mathParser.fillSecondArguments(tokenMap);
 
     // TODO: working, but implement the test anyway
-    // TODO: Also, could just make the map once and then match but ignore missing args.
-    System.out.println(filledSecondArguments);
+    // TODO: Also, could just make the map once and then match but ignore missing args
   }
 
   @Test
@@ -231,7 +231,6 @@ public class MathParserTest {
     Map<Integer, ExpressionEntry> builtRelations = mathParser.buildRelations(filledSecondArguments);
 
     // TODO(Mark): Actually assert something here about the relations.
-    System.out.println(builtRelations);
   }
 
   @Test

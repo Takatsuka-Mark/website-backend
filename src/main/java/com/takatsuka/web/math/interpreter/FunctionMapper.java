@@ -106,7 +106,7 @@ public class FunctionMapper {
     tmp.put(Function.SINE, 1);
     tmp.put(Function.COSINE, 1);
     tmp.put(Function.SQUARE_ROOT, 1);
-    tmp.put(Function.MAX, Integer.MIN_VALUE);
+    tmp.put(Function.MAX, Integer.MAX_VALUE);
     return tmp;
   }
 }

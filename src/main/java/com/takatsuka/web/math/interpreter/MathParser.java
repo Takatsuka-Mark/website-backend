@@ -83,7 +83,6 @@ public class MathParser {
             } else if (secondaryToken.matches("[,]") && requiredClosingParen == 1) {
               // This is the end of the previous param. Evaluate it, and store it as a param
               secondaryTokens.remove(secondaryTokens.size() - 1); // Remove the last token ','
-              System.out.println("Evaluating tokens: " + secondaryTokens);
               String result = String.valueOf(evaluate(secondaryTokens));
               expressionTable.put(
                   funcId, expressionTable.get(funcId).toBuilder().addArgs(result).build());
@@ -94,6 +93,7 @@ public class MathParser {
           } while (requiredClosingParen > 0);
           i -= 1;
 
+          secondaryTokens.remove(secondaryTokens.size() - 1); // Remove the last token ')'
           String result = String.valueOf(evaluate(secondaryTokens));
           expressionTable.put(
               funcId, expressionTable.get(funcId).toBuilder().addArgs(result).build());
@@ -113,7 +113,6 @@ public class MathParser {
           // It is some sort of function.
           funcId += 1;
           int level;
-          System.out.println("This token should be a function: '" + token + "'");
           Function function = FunctionMapper.mapStringToFunction(token);
           switch (Objects.requireNonNull(function)) {
             case ADD:
@@ -135,6 +134,7 @@ public class MathParser {
           ExpressionEntry.Builder expressionBuilder = ExpressionEntry.newBuilder();
           expressionBuilder
               .setId(funcId)
+
               .setLevel(level + argPriority)
               .setFunction(function)
               .setMaxArg(FunctionMapper.getMaxArgs(function));

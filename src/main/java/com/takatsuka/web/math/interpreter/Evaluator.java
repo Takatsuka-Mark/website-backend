@@ -35,7 +35,7 @@ public class Evaluator {
       case COSINE:
         return Math.cos(Double.parseDouble(args.get(0)));
 
-        // Bi Variable Functions
+        // N Variable Functions
       case MAX:
         Optional<Double> result = args.stream().map(Double::parseDouble).max(Double::compare);
         return result.orElse(0.0D); // TODO(mark): This should return some known default value.
