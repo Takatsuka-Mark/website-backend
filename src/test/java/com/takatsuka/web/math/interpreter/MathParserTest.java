@@ -7,6 +7,7 @@ import com.takatsuka.web.interpreter.Function;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.beans.Expression;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +15,9 @@ public class MathParserTest {
   private MathParser mathParser;
   private final Map<Integer, ExpressionEntry> expectedExpressionMap =
       generateExpectedExpressionMap();
-  private static final String SIMPLE_EXPRESSION = "1 + 2";
-  private static final String MONO_VARIABLE_EXPRESSION = "2 * sqrt(9) + sqrt(24 / 3)";
+  private static final String SIMPLE_EXPRESSION = "1 + 2 * 9";
+  private static final String MONO_VARIABLE_EXPRESSION = "2 * sqrt(9) + sqrt(300 / 3)";
+  private static final String MULTI_VARIABLE_EXPRESSION = "max(5, 20 / 2)";
 
   @Before
   public void init() {
@@ -34,18 +36,23 @@ public class MathParserTest {
 
   @Test
   public void testEvaluate_simple() {
-    Truth.assertThat(mathParser.evaluate(SIMPLE_EXPRESSION)).isEqualTo(3.0);
+    Truth.assertThat(mathParser.evaluate(SIMPLE_EXPRESSION)).isEqualTo((double)1 + 2 * 9);
   }
 
   @Test
   public void testEvaluate_monoVariable() {
     Truth.assertThat(mathParser.evaluate(MONO_VARIABLE_EXPRESSION))
-        .isEqualTo(2 * Math.sqrt(9) + Math.sqrt((double) 24 / 3));
+        .isEqualTo(2 * Math.sqrt(9) + Math.sqrt((double) 300 / 3));
+  }
+
+  @Test
+  public void testEvaluate_multiVariable() {
+    Truth.assertThat(mathParser.evaluate(MULTI_VARIABLE_EXPRESSION)).isEqualTo(10.0);
   }
 
   @Test
   public void testTokenize_simple() {
-    List<String> expectedTokens = List.of("1", "+", "2");
+    List<String> expectedTokens = List.of("1", "+", "2", "*", "9");
 
     List<String> fetchedTokens = mathParser.tokenize(SIMPLE_EXPRESSION);
 
@@ -55,7 +62,7 @@ public class MathParserTest {
   @Test
   public void testTokenize_monoVariable() {
     List<String> expectedTokens =
-        List.of("2", "*", "sqrt", "(", "9", ")", "+", "sqrt", "(", "24", "/", "3", ")");
+        List.of("2", "*", "sqrt", "(", "9", ")", "+", "sqrt", "(", "300", "/", "3", ")");
 
     List<String> fetchedTokens = mathParser.tokenize(MONO_VARIABLE_EXPRESSION);
 
@@ -63,18 +70,36 @@ public class MathParserTest {
   }
 
   @Test
+  public void testTokenize_multiVariable() {
+    List<String> expectedTokens = List.of("max", "(", "5", ",", "20", "/", "2",")");
+
+    List<String> fetchedTokens = mathParser.tokenize(MULTI_VARIABLE_EXPRESSION);
+
+    Truth.assertThat(expectedTokens).containsExactlyElementsIn(fetchedTokens);
+  }
+
+  @Test
   public void testLoadTokensIntoTables_simpleExpression() {
     List<String> testTokens = mathParser.tokenize(SIMPLE_EXPRESSION);
-    ExpressionEntry expectedEntry =
-        ExpressionEntry.newBuilder()
-            .setLevel(1)
-            .setId(1)
-            .setFunction(Function.ADD)
-            .addArgs("1")
-            .addArgs("2")
-            .setMaxArg(2)
-            .build();
-    Map<Integer, ExpressionEntry> expectedMap = Map.of(1, expectedEntry);
+    Map<Integer, ExpressionEntry> expectedMap =
+        Map.of(
+            1,
+            ExpressionEntry.newBuilder()
+                .setLevel(1)
+                .setId(1)
+                .setFunction(Function.ADD)
+                .addArgs("1")
+                .setMaxArg(2)
+                .build(),
+            2,
+            ExpressionEntry.newBuilder()
+                .setLevel(2)
+                .setId(2)
+                .setFunction(Function.MULTIPLY)
+                .addArgs("2")
+                .addArgs("9")
+                .setMaxArg(2)
+                .build());
 
     Map<Integer, ExpressionEntry> fetchedMap = mathParser.loadTokensIntoTables(testTokens);
 
@@ -92,7 +117,6 @@ public class MathParserTest {
                 .setFunction(Function.MULTIPLY)
                 .setMaxArg(2)
                 .addArgs("2")
-                .addArgs("0")
                 .setLevel(2)
                 .build(),
             2,
@@ -108,8 +132,6 @@ public class MathParserTest {
                 .setId(3)
                 .setFunction(Function.ADD)
                 .setMaxArg(2)
-                .addArgs("0")
-                .addArgs("0")
                 .setLevel(1)
                 .build(),
             4,
@@ -117,7 +139,7 @@ public class MathParserTest {
                 .setId(4)
                 .setFunction(Function.SQUARE_ROOT)
                 .setMaxArg(1)
-                .addArgs("8.0")
+                .addArgs("100.0")
                 .setLevel(10)
                 .build());
 
@@ -128,34 +150,14 @@ public class MathParserTest {
 
   @Test
   public void testFillSecondArguments_simple() {
-    ExpressionEntry entry1 =
-        ExpressionEntry.newBuilder()
-            .setFunction(Function.ADD)
-            .addArgs("1")
-            .addArgs("0")
-            .setMaxArg(2)
-            .build();
-    ExpressionEntry expectedEntry1 =
-        ExpressionEntry.newBuilder()
-            .setFunction(Function.ADD)
-            .addArgs("1")
-            .addArgs("2")
-            .setMaxArg(2)
-            .build();
-    ExpressionEntry entry2 =
-        ExpressionEntry.newBuilder()
-            .setFunction(Function.MULTIPLY)
-            .addArgs("2")
-            .addArgs("3")
-            .setMaxArg(2)
-            .build();
+    List<String> tokens = mathParser.tokenize(SIMPLE_EXPRESSION);
+    Map<Integer, ExpressionEntry> tokenMap = mathParser.loadTokensIntoTables(tokens);
+    Map<Integer, ExpressionEntry> filledSecondArguments = mathParser.fillSecondArguments(tokenMap);
 
-    Map<Integer, ExpressionEntry> testMap = Map.of(1, entry1, 2, entry2);
-    Map<Integer, ExpressionEntry> fetchedMap = mathParser.fillSecondArguments(testMap);
+    Map<Integer, ExpressionEntry> expectedArgs =
+        Map.of(1, tokenMap.get(1).toBuilder().addArgs("2").build(), 2, tokenMap.get(2));
 
-    Map<Integer, ExpressionEntry> expectedMap = Map.of(1, expectedEntry1, 2, entry2);
-
-    ProtoTruth.assertThat(fetchedMap).containsExactlyEntriesIn(expectedMap);
+    ProtoTruth.assertThat(expectedArgs).containsExactlyEntriesIn(filledSecondArguments);
   }
 
   @Test
@@ -166,6 +168,7 @@ public class MathParserTest {
 
     // TODO: working, but implement the test anyway
     // TODO: Also, could just make the map once and then match but ignore missing args.
+    System.out.println(filledSecondArguments);
   }
 
   @Test
@@ -228,6 +231,7 @@ public class MathParserTest {
     Map<Integer, ExpressionEntry> builtRelations = mathParser.buildRelations(filledSecondArguments);
 
     // TODO(Mark): Actually assert something here about the relations.
+    System.out.println(builtRelations);
   }
 
   @Test
@@ -239,25 +243,25 @@ public class MathParserTest {
                 .setId(1)
                 .setFunction(Function.ADD)
                 .setMaxArg(2)
+                .addArgs("1")
                 .addArgs("2")
-                .addArgs("5")
-                .setArgOf(2)
-                .setArgId(1)
+                .setArgOf(0)
+                .setArgId(0)
                 .build(),
             2,
             ExpressionEntry.newBuilder()
                 .setId(2)
                 .setFunction(Function.MULTIPLY)
                 .setMaxArg(2)
-                .addArgs("0") // Filler. It will be replaced
+                .addArgs("2")
                 .addArgs("9")
-                .setArgOf(0)
-                .setArgId(0)
+                .setArgOf(1)
+                .setArgId(2)
                 .build());
-    List<Integer> sequenceList = List.of(1, 2);
+    List<Integer> sequenceList = List.of(2, 1);
 
     double result = mathParser.evaluateMap(expressionMap, sequenceList);
-    Truth.assertThat(result).isEqualTo((double) (2 + 5) * 9);
+    Truth.assertThat(result).isEqualTo(1 + (double) (2 * 9));
   }
 
   private static Map<Integer, ExpressionEntry> generateExpectedExpressionMap() {

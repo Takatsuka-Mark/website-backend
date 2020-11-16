@@ -3,7 +3,6 @@ package com.takatsuka.web.math.interpreter;
 import com.takatsuka.web.interpreter.ExpressionEntry;
 import com.takatsuka.web.interpreter.Function;
 import com.takatsuka.web.logging.MathLogger;
-import org.apache.el.lang.ExpressionBuilder;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -69,21 +68,36 @@ public class MathParser {
       String token = tokens.get(i);
       if (token.matches("[(]")) {
         if (outstandingParams > 0) {
+          // There must be a function present. Process and evaluate the args.
           int requiredClosingParen = 0;
           // Fetch the next tokens which need to be processed
           List<String> secondaryTokens = new ArrayList<>();
           do {
             String secondaryToken = tokens.get(i);
             secondaryTokens.add(secondaryToken);
-            if (secondaryToken.matches("[(]")) requiredClosingParen += 1;
-            if (secondaryToken.matches("[)]")) requiredClosingParen -= 1;
+
+            if (secondaryToken.matches("[(]")) {
+              requiredClosingParen += 1;
+            } else if (secondaryToken.matches("[)]")) {
+              requiredClosingParen -= 1;
+            } else if (secondaryToken.matches("[,]") && requiredClosingParen == 1) {
+              // This is the end of the previous param. Evaluate it, and store it as a param
+              secondaryTokens.remove(secondaryTokens.size() - 1); // Remove the last token ','
+              System.out.println("Evaluating tokens: " + secondaryTokens);
+              String result = String.valueOf(evaluate(secondaryTokens));
+              expressionTable.put(
+                  funcId, expressionTable.get(funcId).toBuilder().addArgs(result).build());
+              // Reset the token params for the next token
+              secondaryTokens.clear();
+            }
             i += 1;
           } while (requiredClosingParen > 0);
           i -= 1;
-          
+
           String result = String.valueOf(evaluate(secondaryTokens));
           expressionTable.put(
-              funcId, expressionTable.get(funcId).toBuilder().setArgs(0, result).build());
+              funcId, expressionTable.get(funcId).toBuilder().addArgs(result).build());
+
         } else {
           argPriority += 10;
         }
@@ -99,6 +113,7 @@ public class MathParser {
           // It is some sort of function.
           funcId += 1;
           int level;
+          System.out.println("This token should be a function: '" + token + "'");
           Function function = FunctionMapper.mapStringToFunction(token);
           switch (Objects.requireNonNull(function)) {
             case ADD:
@@ -122,21 +137,18 @@ public class MathParser {
               .setId(funcId)
               .setLevel(level + argPriority)
               .setFunction(function)
-              .setMaxArg(FunctionMapper.mapFunctionToMaxArgs(function));
+              .setMaxArg(FunctionMapper.getMaxArgs(function));
 
           // We shouldn't have to make this call to FunctionMapper twice.
           if (FunctionMapper.isSymbolFunction(token)) {
             // This is of the form ' a [function] b '
             if (!argBackup.isEmpty()) {
-              expressionBuilder.addArgs(argBackup.remove()); // Get the previous arg
-            } else {
-              expressionBuilder.addArgs("0");
+              // Add it as another variable
+              expressionBuilder.addArgs(argBackup.remove());
             }
-            expressionBuilder.addArgs("0");
-          } else if (FunctionMapper.isMonoVariableFunction(token)) {
+          } else if (FunctionMapper.isMultiVariableFunction(token)) {
             // This is of the form ' [function]( a ) '
-            outstandingParams += FunctionMapper.mapFunctionToMaxArgs(function);
-            expressionBuilder.addArgs("0");
+            outstandingParams += 1;
           }
 
           expressionTable.put(funcId, expressionBuilder.build());
@@ -147,25 +159,28 @@ public class MathParser {
     // Make sure we don't bypass the final value.
     if (!argBackup.isEmpty()) {
       if (expressionTable.size() > 0) {
-        // There must be a previous function
-
+        // There must be a previous function. Add it as an arg.
         int idx = Collections.max(expressionTable.keySet());
-        expressionTable.replace(
-            idx,
-            expressionTable.get(idx).toBuilder()
-                .setArgs(expressionTable.get(idx).getMaxArg() - 1, argBackup.remove())
-                .build());
+        ExpressionEntry.Builder entryToUpdate = expressionTable.get(idx).toBuilder();
+
+        if (FunctionMapper.getMaxArgs(entryToUpdate.getFunction()) == Integer.MAX_VALUE) {
+          // The position is just "the next"
+          entryToUpdate.addArgs(argBackup.remove()); // Get the previous arg
+        } else {
+          for (int j = entryToUpdate.getArgsCount(); j < entryToUpdate.getMaxArg() - 1; j++) {
+            entryToUpdate.addArgs("0"); // Placeholder
+          }
+          entryToUpdate.addArgs(argBackup.remove());
+        }
+
+        expressionTable.replace(idx, entryToUpdate.build());
       } else {
         // This is the only variable represented.
-        // TODO do this a different way
         funcId += 1;
         ExpressionEntry.Builder expressionBuilder = ExpressionEntry.newBuilder();
         expressionBuilder.setId(funcId);
         expressionBuilder.setLevel(argPriority + 1);
         expressionBuilder.addArgs(argBackup.remove());
-        //        expressionBuilder.setFunction(Function.ADD);
-        //        expressionBuilder.addArgs("0");
-        //        expressionBuilder.setMaxArg(2);
         expressionBuilder.setMaxArg(1);
         expressionTable.put(funcId, expressionBuilder.build());
       }
@@ -182,9 +197,9 @@ public class MathParser {
 
     int size = expressions.size();
     for (int i = 1; i < size; i++) {
-      String newArg = expressions.get(i + 1).getArgs(0);
       if (FunctionMapper.isSymbolFunction(expressions.get(i).getFunction())) {
-        resultMap.put(i, expressions.get(i).toBuilder().setArgs(1, newArg).build());
+        String newArg = expressions.get(i + 1).getArgs(0);
+        resultMap.put(i, expressions.get(i).toBuilder().addArgs(newArg).build());
       } else {
         resultMap.put(i, expressions.get(i));
       }
@@ -240,7 +255,11 @@ public class MathParser {
 
       // Add this relation to the relation map, and remove it from the remainingMap
       if (biggestEntry.getId() < thisEntry.getId()) {
-        argId = biggestEntry.getMaxArg();
+        if (biggestEntry.getMaxArg() != Integer.MAX_VALUE) {
+          argId = biggestEntry.getMaxArg();
+        } else {
+          argId = biggestEntry.getArgsCount();
+        }
       }
       relationMap.put(
           thisLevel, thisEntry.toBuilder().setArgOf(biggestEntry.getId()).setArgId(argId).build());
@@ -279,13 +298,14 @@ public class MathParser {
       int argOf = expressionEntry.getArgOf();
       int argId = expressionEntry.getArgId();
 
+      // Ensure that we are only setting variables which need to be set, not just the value.
       if (argOf != 0) {
-        ExpressionEntry expressionToUpdate = expressions.get(argOf);
-        List<String> argsToUpdate = expressionToUpdate.getArgsList();
-        // Work with the ID - 1 because the id is indexed at 1.
-        expressions.put(
-            argOf,
-            expressionToUpdate.toBuilder().setArgs(argId - 1, String.valueOf(finalValue)).build());
+        ExpressionEntry.Builder expressionToUpdate = expressions.get(argOf).toBuilder();
+//        expressionToUpdate.setArgs(argId - 1, String.valueOf(finalValue));
+
+        setArg(expressionToUpdate, argId - 1, String.valueOf(finalValue));
+
+        expressions.put(argOf, expressionToUpdate.build());
       }
     }
     return finalValue;
@@ -324,5 +344,19 @@ public class MathParser {
     }
 
     return currentMaxId;
+  }
+
+  private ExpressionEntry.Builder setArg(ExpressionEntry.Builder builder, int argPosition, String argValue){
+    if(argPosition < builder.getArgsCount()){
+      // It is safe to add it directly to the position
+      builder.setArgs(argPosition, argValue);
+    } else {
+      for (int j = builder.getArgsCount(); j < argPosition; j++) {
+        builder.addArgs("0"); // Placeholder
+      }
+      builder.addArgs(argValue);
+    }
+
+    return builder;
   }
 }

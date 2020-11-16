@@ -57,4 +57,5 @@ enum Function {
     SINE = 10;
     COSINE = 11;
     SQUARE_ROOT = 12;
+    MAX = 13;
 }
