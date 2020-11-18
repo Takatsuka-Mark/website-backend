@@ -27,28 +27,30 @@ public class MathParserTest {
   @Test
   public void testEvaluate_single() {
     // TODO(mark): '1)' fails, but '1' does not.
-    Truth.assertThat(mathParser.evaluate("1")).isEqualTo(1.0);
+    Truth.assertThat(mathParser.evaluate("1")).isEqualTo("1");
   }
 
   @Test
   public void testEvaluate_negative() {
-    Truth.assertThat(mathParser.evaluate("-1")).isEqualTo(-1.0);
+    Truth.assertThat(mathParser.evaluate("-1")).isEqualTo("-1");
   }
 
   @Test
   public void testEvaluate_simple() {
-    Truth.assertThat(mathParser.evaluate(SIMPLE_EXPRESSION)).isEqualTo((double)1 + 2 * 9);
+    Truth.assertThat(mathParser.evaluate(SIMPLE_EXPRESSION))
+        .isEqualTo("19");
   }
 
   @Test
   public void testEvaluate_monoVariable() {
     Truth.assertThat(mathParser.evaluate(MONO_VARIABLE_EXPRESSION))
-        .isEqualTo(2 * Math.sqrt(9) + Math.sqrt((double) 300 / 3));
+        .isEqualTo("16");
   }
 
   @Test
   public void testEvaluate_multiVariable_max2() {
-    Truth.assertThat(mathParser.evaluate(MULTI_VARIABLE_EXPRESSION)).isEqualTo(10.0);
+    Truth.assertThat(mathParser.evaluate(MULTI_VARIABLE_EXPRESSION))
+        .isEqualTo("10");
   }
 
   @Test
@@ -72,7 +74,7 @@ public class MathParserTest {
 
   @Test
   public void testTokenize_multiVariable() {
-    List<String> expectedTokens = List.of("max", "(", "5", ",", "20", "/", "2",")");
+    List<String> expectedTokens = List.of("max", "(", "5", ",", "20", "/", "2", ")");
 
     List<String> fetchedTokens = mathParser.tokenize(MULTI_VARIABLE_EXPRESSION);
 
@@ -125,7 +127,7 @@ public class MathParserTest {
                 .setId(2)
                 .setFunction(Function.SQUARE_ROOT)
                 .setMaxArg(1)
-                .addArgs("9.0")
+                .addArgs("9")
                 .setLevel(10)
                 .build(),
             3,
@@ -140,7 +142,7 @@ public class MathParserTest {
                 .setId(4)
                 .setFunction(Function.SQUARE_ROOT)
                 .setMaxArg(1)
-                .addArgs("100.0")
+                .addArgs("100")
                 .setLevel(10)
                 .build());
 
@@ -259,8 +261,8 @@ public class MathParserTest {
                 .build());
     List<Integer> sequenceList = List.of(2, 1);
 
-    double result = mathParser.evaluateMap(expressionMap, sequenceList);
-    Truth.assertThat(result).isEqualTo(1 + (double) (2 * 9));
+    String result = mathParser.evaluateMap(expressionMap, sequenceList);
+    Truth.assertThat(result).isEqualTo("19");
   }
 
   private static Map<Integer, ExpressionEntry> generateExpectedExpressionMap() {

@@ -6,6 +6,7 @@ import com.takatsuka.web.logging.MathLogger;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,15 +23,18 @@ public class MathParser {
   private static final Logger logger = MathLogger.forCallingClass();
 
   private final Pattern regex = FunctionMapper.getPattern();
+  private final Evaluator evaluator;
 
-  public MathParser() {}
+  public MathParser() {
+    evaluator = new Evaluator();
+  }
 
-  public double evaluate(String expression) {
+  public String evaluate(String expression) {
     ArrayList<String> tokens = tokenize(expression);
     return evaluate(tokens);
   }
 
-  private double evaluate(List<String> tokens) {
+  private String evaluate(List<String> tokens) {
     Map<Integer, ExpressionEntry> expressionTable1 = loadTokensIntoTables(tokens);
     Map<Integer, ExpressionEntry> expressionTable2 = fillSecondArguments(expressionTable1);
     Map<Integer, ExpressionEntry> expressionTable3 = buildRelations(expressionTable2);
@@ -83,7 +87,7 @@ public class MathParser {
             } else if (secondaryToken.matches("[,]") && requiredClosingParen == 1) {
               // This is the end of the previous param. Evaluate it, and store it as a param
               secondaryTokens.remove(secondaryTokens.size() - 1); // Remove the last token ','
-              String result = String.valueOf(evaluate(secondaryTokens));
+              String result = evaluate(secondaryTokens);
               expressionTable.put(
                   funcId, expressionTable.get(funcId).toBuilder().addArgs(result).build());
               // Reset the token params for the next token
@@ -288,13 +292,13 @@ public class MathParser {
   }
 
   /** Parser step 6.0 (no its not 5.0) */
-  public double evaluateMap(Map<Integer, ExpressionEntry> expressionTable, List<Integer> sequence) {
+  public String evaluateMap(Map<Integer, ExpressionEntry> expressionTable, List<Integer> sequence) {
     HashMap<Integer, ExpressionEntry> expressions = new HashMap<>(expressionTable);
-    double finalValue = 0.0D;
+    String finalValue = "";
     for (Integer index : sequence) {
       ExpressionEntry expressionEntry = expressions.get(index);
       finalValue =
-          Evaluator.evaluateFunction(expressionEntry.getFunction(), expressionEntry.getArgsList());
+          evaluator.evaluateFunction(expressionEntry.getFunction(), expressionEntry.getArgsList());
       int argOf = expressionEntry.getArgOf();
       int argId = expressionEntry.getArgId();
 
@@ -303,7 +307,7 @@ public class MathParser {
         ExpressionEntry.Builder expressionToUpdate = expressions.get(argOf).toBuilder();
 //        expressionToUpdate.setArgs(argId - 1, String.valueOf(finalValue));
 
-        setArg(expressionToUpdate, argId - 1, String.valueOf(finalValue));
+        setArg(expressionToUpdate, argId - 1, finalValue);
 
         expressions.put(argOf, expressionToUpdate.build());
       }
