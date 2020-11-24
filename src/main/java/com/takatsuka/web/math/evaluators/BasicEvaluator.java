@@ -3,6 +3,7 @@ package com.takatsuka.web.math.evaluators;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class BasicEvaluator {
@@ -23,8 +24,8 @@ public class BasicEvaluator {
     return String.valueOf(input.sqrt(mathContext));
   }
 
-  public String max(BigDecimal ... input){
-    Optional<BigDecimal> result = Arrays.stream(input).max(BigDecimal::compareTo);
+  public String max(List<BigDecimal> input){
+    Optional<BigDecimal> result = input.stream().max(BigDecimal::compareTo);
     if (result.isPresent()) {
       return result.get().toString();
     } else {

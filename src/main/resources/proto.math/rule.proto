@@ -37,4 +37,6 @@ enum ParamType{
     UNKNOWN = 0;
     INTEGER = 1;
     DECIMAL = 2;
+    INTEGER_LIST = 3;
+    DECIMAL_LIST = 4;
 }

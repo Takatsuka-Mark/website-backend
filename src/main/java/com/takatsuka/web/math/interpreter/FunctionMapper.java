@@ -140,18 +140,10 @@ public class FunctionMapper {
           case INTEGER:
             args.add(BigInteger.class);
             break;
-        }
-      }
-
-      if (functionDefinition.getMaxArgs() == Integer.MAX_VALUE) {
-        // Then it must take a list of values
-        switch (functionDefinition.getMathMethod().getParamTypesList().get(0)) {
-          case DECIMAL:
-            return c.getDeclaredMethod(
-                functionDefinition.getMathMethod().getMethodName(), BigDecimal[].class);
-          case INTEGER:
-            return c.getDeclaredMethod(
-                functionDefinition.getMathMethod().getMethodName(), BigInteger[].class);
+          case INTEGER_LIST:
+            args.add(List.class);
+          case DECIMAL_LIST:
+            args.add(List.class);
         }
       }
 

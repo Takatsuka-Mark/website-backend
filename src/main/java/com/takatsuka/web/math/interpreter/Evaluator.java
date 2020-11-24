@@ -64,13 +64,14 @@ public class Evaluator {
         return String.valueOf(new BigDecimal(args.get(0)).abs(mathContext));
 
         // N Variable Functions
-//      case MAX:
-//        Optional<BigDecimal> result = args.stream().map(BigDecimal::new).max(BigDecimal::compareTo);
-//        if (result.isPresent()) {
-//          return result.get().toString();
-//        } else {
-//          return DEFAULT;
-//        }
+        //      case MAX:
+        //        Optional<BigDecimal> result =
+        // args.stream().map(BigDecimal::new).max(BigDecimal::compareTo);
+        //        if (result.isPresent()) {
+        //          return result.get().toString();
+        //        } else {
+        //          return DEFAULT;
+        //        }
     }
 
     Method method = methodMap.get(function);
@@ -87,12 +88,30 @@ public class Evaluator {
     return DEFAULT;
   }
 
-  private List<Object> parseParams(List<String> args, List<ParamType> paramTypes){
+  private List<Object> parseParams(List<String> args, List<ParamType> paramTypes) {
     List<Object> finalArgs = new ArrayList<>();
 
-    for(int i = 0; i < args.size(); i++) {
+    // Cover the n param functions.
+    if(paramTypes.get(0) == ParamType.DECIMAL_LIST){
+      List<BigDecimal> argsList = new ArrayList<>();
+      for (String arg : args) {
+          argsList.add(new BigDecimal(arg));
+      }
+      finalArgs.add(argsList);
+      return finalArgs;
+    } else if(paramTypes.get(0) == ParamType.INTEGER_LIST) {
+      List<BigInteger> argsList = new ArrayList<>();
+      for (String arg : args) {
+        argsList.add(new BigInteger(arg));
+      }
+      finalArgs.add(argsList);
+      return finalArgs;
+    }
+
+    // Cover functions with a discrete number of parameters.
+    for (int i = 0; i < args.size(); i++) {
       ParamType paramType;
-      if(i < paramTypes.size()) {
+      if (i < paramTypes.size()) {
         paramType = paramTypes.get(i);
       } else {
         paramType = paramTypes.get(paramTypes.size() - 1);
