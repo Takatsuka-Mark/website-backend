@@ -3,6 +3,8 @@ syntax = "proto3";
 option java_package = "com.takatsuka.web.interpreter";
 option java_multiple_files = true;
 
+package interpreter;
+
 // P.20
 message VariableEntry {
     int32 id = 1;
@@ -58,5 +60,34 @@ enum Function {
     COSINE = 11;
     SQUARE_ROOT = 12;
     MAX = 13;
-    CHOOSE = 14;
+    MIN = 14;
+    CHOOSE = 15;
+    PERM = 16;
+    FLOOR = 17;
+    CEIL = 18;
+    LN = 19;
+    LG = 20;
+    LOG = 21;
+    LOGN = 22;
+    RNG = 23;
+    RNG_FLOAT = 24;
+    TANGENT = 25;
+    TANGENT_INVERSE = 26;
+    SINE_INVERSE = 27;
+    COSINE_INVERSE = 28;
+    TANGENT_HYPERBOLIC = 29;
+    SINE_HYPERBOLIC = 30;
+    COSINE_HYPERBOLIC = 31;
+    SECANT = 32;
+    COSECANT = 33;
+    COTANGENT = 34;
+    SECANT_INVERSE = 35;
+    COSECANT_INVERSE = 36;
+    COTANGENT_INVERSE = 37;
+    SECANT_HYPERBOLIC = 38;
+    COSECANT_HYPERBOLIC = 39;
+    COTANGENT_HYPERBOLIC = 40;
+    GCD = 41;
+    LCM = 42;
+
 }

@@ -7,9 +7,4 @@ import org.junit.Test;
 
 public class FunctionMapperTest {
 
-  @Test
-  public void testMapStringToFunction_symbolFunction() {
-    String add = "+";
-    Truth.assertThat(FunctionMapper.mapStringToFunction(add)).isEqualTo(Function.ADD);
-  }
 }

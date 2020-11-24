@@ -1,0 +1,13 @@
+{
+  "title": "Maximum",
+  "description": "Finds the maximum value in the set of parameters",
+  "pattern": "max",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
+    "methodName": "max",
+    "paramTypes": ["DECIMAL"]
+  },
+  "symbol": "max",
+  "function": "MAX",
+  "maxArgs": 2147483647
+}

@@ -2,8 +2,14 @@ package com.takatsuka.web.math.interpreter;
 
 import com.google.common.truth.Truth;
 import com.google.common.truth.extensions.proto.ProtoTruth;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.util.JsonFormat;
 import com.takatsuka.web.interpreter.ExpressionEntry;
 import com.takatsuka.web.interpreter.Function;
+import com.takatsuka.web.interpreter.FunctionDefinition;
+import com.takatsuka.web.interpreter.MathMethod;
+import com.takatsuka.web.interpreter.ParamType;
+import com.takatsuka.web.utils.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +27,11 @@ public class MathParserTest {
 
   @Before
   public void init() {
-    mathParser = new MathParser();
+    FunctionLoader functionLoader = new FunctionLoader(new FileUtils());
+    FunctionMapper functionMapper = new FunctionMapper(functionLoader.loadFunctions());
+    mathParser =
+        new MathParser(
+            functionMapper); // TODO(mark): Figure out how to get the functions into here.
   }
 
   @Test
@@ -37,20 +47,17 @@ public class MathParserTest {
 
   @Test
   public void testEvaluate_simple() {
-    Truth.assertThat(mathParser.evaluate(SIMPLE_EXPRESSION))
-        .isEqualTo("19");
+    Truth.assertThat(mathParser.evaluate(SIMPLE_EXPRESSION)).isEqualTo("19");
   }
 
   @Test
   public void testEvaluate_monoVariable() {
-    Truth.assertThat(mathParser.evaluate(MONO_VARIABLE_EXPRESSION))
-        .isEqualTo("16");
+    Truth.assertThat(mathParser.evaluate(MONO_VARIABLE_EXPRESSION)).isEqualTo("16");
   }
 
   @Test
   public void testEvaluate_multiVariable_max2() {
-    Truth.assertThat(mathParser.evaluate(MULTI_VARIABLE_EXPRESSION))
-        .isEqualTo("10");
+    Truth.assertThat(mathParser.evaluate(MULTI_VARIABLE_EXPRESSION)).isEqualTo("10");
   }
 
   @Test

@@ -1,35 +1,28 @@
 package com.takatsuka.web.math;
 
 import com.takatsuka.web.logging.MathLogger;
+import com.takatsuka.web.math.interpreter.FunctionMapper;
 import com.takatsuka.web.math.interpreter.MathParser;
-import com.takatsuka.web.math.rules.RuleLoader;
-import com.takatsuka.web.rules.Function;
-import com.takatsuka.web.rules.Operator;
+import com.takatsuka.web.math.interpreter.FunctionLoader;
 import org.slf4j.Logger;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
-@Component
+@Service
 public class MathService {
-    private static final Logger logger = MathLogger.forCallingClass();
+  private static final Logger logger = MathLogger.forCallingClass();
 
-    private RuleLoader ruleLoader;
-    private MathParser mathParser;
-//    private HashMap<String, Rule> functions;
+  private FunctionLoader functionLoader;
+  private FunctionMapper functionMapper;
+  private MathParser mathParser;
 
+  MathService(FunctionLoader functionLoader) {
+    this.functionLoader = functionLoader;
+    this.functionMapper = new FunctionMapper(functionLoader.loadFunctions());
+    this.mathParser = new MathParser(functionMapper);
+  }
 
-    MathService(RuleLoader ruleLoader) {
-        this.ruleLoader = ruleLoader;
-        this.mathParser = new MathParser();
-        HashMap<String, Function> functions = ruleLoader.loadFunctions();
-        HashMap<String, Operator> operators = ruleLoader.loadOperators();
-    }
-
-    public String evaluateExpression(String expression) {
-        logger.trace("Evaluating expression '{}'", expression);
-        return "Big O'l Eval time: " + mathParser.evaluate(expression);
-    }
+  public String evaluateExpression(String expression) {
+    logger.trace("Evaluating expression '{}'", expression);
+    return "Big O'l Eval time: " + mathParser.evaluate(expression);
+  }
 }

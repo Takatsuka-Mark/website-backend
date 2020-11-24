@@ -18,15 +18,17 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Component
 public class MathParser {
   private static final Logger logger = MathLogger.forCallingClass();
 
-  private final Pattern regex = FunctionMapper.getPattern();
+  private final Pattern regex;
   private final Evaluator evaluator;
+  private final FunctionMapper functionMapper;
 
-  public MathParser() {
-    evaluator = new Evaluator();
+  public MathParser(FunctionMapper functionMapper) {
+    this.functionMapper = functionMapper;
+    regex = functionMapper.getPattern();
+    evaluator = new Evaluator(functionMapper);
   }
 
   public String evaluate(String expression) {
@@ -110,14 +112,14 @@ public class MathParser {
       } else {
         // It is not a paren.
 
-        if (token.matches(FunctionMapper.getNumRegex())) {
+        if (token.matches(functionMapper.getNumRegex())) {
           // It is a number.
           argBackup.add(token);
         } else {
           // It is some sort of function.
           funcId += 1;
           int level;
-          Function function = FunctionMapper.mapStringToFunction(token);
+          Function function = functionMapper.mapStringToFunction(token);
           switch (Objects.requireNonNull(function)) {
             case ADD:
             case SUBTRACT:
@@ -138,19 +140,18 @@ public class MathParser {
           ExpressionEntry.Builder expressionBuilder = ExpressionEntry.newBuilder();
           expressionBuilder
               .setId(funcId)
-
               .setLevel(level + argPriority)
               .setFunction(function)
-              .setMaxArg(FunctionMapper.getMaxArgs(function));
+              .setMaxArg(functionMapper.getMaxArgs(function));
 
           // We shouldn't have to make this call to FunctionMapper twice.
-          if (FunctionMapper.isSymbolFunction(token)) {
+          if (functionMapper.isSymbolFunction(token)) {
             // This is of the form ' a [function] b '
             if (!argBackup.isEmpty()) {
               // Add it as another variable
               expressionBuilder.addArgs(argBackup.remove());
             }
-          } else if (FunctionMapper.isMultiVariableFunction(token)) {
+          } else if (functionMapper.isMultiVariableFunction(token)) {
             // This is of the form ' [function]( a ) '
             outstandingParams += 1;
           }
@@ -167,7 +168,7 @@ public class MathParser {
         int idx = Collections.max(expressionTable.keySet());
         ExpressionEntry.Builder entryToUpdate = expressionTable.get(idx).toBuilder();
 
-        if (FunctionMapper.getMaxArgs(entryToUpdate.getFunction()) == Integer.MAX_VALUE) {
+        if (functionMapper.getMaxArgs(entryToUpdate.getFunction()) == Integer.MAX_VALUE) {
           // The position is just "the next"
           entryToUpdate.addArgs(argBackup.remove()); // Get the previous arg
         } else {
@@ -201,7 +202,7 @@ public class MathParser {
 
     int size = expressions.size();
     for (int i = 1; i < size; i++) {
-      if (FunctionMapper.isSymbolFunction(expressions.get(i).getFunction())) {
+      if (functionMapper.isSymbolFunction(expressions.get(i).getFunction())) {
         String newArg = expressions.get(i + 1).getArgs(0);
         resultMap.put(i, expressions.get(i).toBuilder().addArgs(newArg).build());
       } else {
@@ -305,7 +306,7 @@ public class MathParser {
       // Ensure that we are only setting variables which need to be set, not just the value.
       if (argOf != 0) {
         ExpressionEntry.Builder expressionToUpdate = expressions.get(argOf).toBuilder();
-//        expressionToUpdate.setArgs(argId - 1, String.valueOf(finalValue));
+        //        expressionToUpdate.setArgs(argId - 1, String.valueOf(finalValue));
 
         setArg(expressionToUpdate, argId - 1, finalValue);
 
@@ -350,8 +351,9 @@ public class MathParser {
     return currentMaxId;
   }
 
-  private ExpressionEntry.Builder setArg(ExpressionEntry.Builder builder, int argPosition, String argValue){
-    if(argPosition < builder.getArgsCount()){
+  private ExpressionEntry.Builder setArg(
+      ExpressionEntry.Builder builder, int argPosition, String argValue) {
+    if (argPosition < builder.getArgsCount()) {
       // It is safe to add it directly to the position
       builder.setArgs(argPosition, argValue);
     } else {

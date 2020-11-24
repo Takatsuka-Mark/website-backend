@@ -2,10 +2,12 @@
   "title": "Square Root",
   "description": "Normal Square Root Function",
   "pattern": "sqrt",
-  "math_method": {
-    "class_name": "com.takatsuka.web.math.evaluators.MathOps",
-    "method_name": "sqrt",
-    "params": ["java.lang.Double"]
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
+    "methodName": "squareRoot",
+    "paramTypes": ["DECIMAL"]
   },
-  "is_right_associative": "false"
+  "symbol": "sqrt",
+  "function": "SQUARE_ROOT",
+  "maxArgs": 1
 }
