@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option java_package = "com.takatsuka.web.interpreter";
+option java_multiple_files = true;
+
+package interpreter;
+
+import "tables.proto";
+
+message FunctionDefinition{
+    string title = 1;
+
+    string description = 2;
+
+    // The regex pattern to match
+    string pattern = 3;
+
+    // The tokenized symbol of the function
+    string symbol = 4;
+
+    MathMethod math_method = 5;
+
+    Function function = 6;
+
+    int32 max_args = 7;
+}
+
+message MathMethod {
+    string class_name = 1;
+
+    string method_name = 2;
+
+    repeated ParamType param_types = 3;
+}
+
+enum ParamType{
+    UNKNOWN = 0;
+    INTEGER = 1;
+    DECIMAL = 2;
+    INTEGER_LIST = 3;
+    DECIMAL_LIST = 4;
+}

@@ -1,0 +1,13 @@
+{
+  "title": "Minimum",
+  "description": "Finds the minimum value in the set of parameters",
+  "pattern": "min",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
+    "methodName": "min",
+    "paramTypes": ["DECIMAL_LIST"]
+  },
+  "symbol": "min",
+  "function": "MIN",
+  "maxArgs": 2147483647
+}

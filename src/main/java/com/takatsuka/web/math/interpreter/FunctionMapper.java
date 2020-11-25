@@ -1,112 +1,158 @@
 package com.takatsuka.web.math.interpreter;
 
 import com.takatsuka.web.interpreter.Function;
+import com.takatsuka.web.interpreter.FunctionDefinition;
+import com.takatsuka.web.interpreter.ParamType;
+import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 public class FunctionMapper {
 
-  private static final Map<String, Function> MULTI_VARIALBE_FUNCTION_MAP =
-      generateFunctionMap();
-  private static final Map<String, Function> SYMBOL_OPERATOR_MAP = generateSymbolOperatorMap();
-  private static final Map<Function, Integer> FUNCTION_TO_MAX_ARG_MAP =
-      generateFunctionToMaxArgsMap();
+  private final Map<String, Function> multiVariableFunctionMap;
+  private final Map<String, Function> symbolOperatorMap;
+  private final Map<Function, Integer> functionToMaxArgMap;
+  private final Map<Function, Method> functionToMethodMap;
+  private final Map<Function, List<ParamType>> functionToParamTypeMap;
 
-  private static final String SymbolGroups = "([+\\-*/%^!()])";
-  private static final String numRegex = "(-?\\d+(.\\d+)?)";
+  private static final String SYMBOL_GROUPS = "([+\\-*/%^!()])";
+  private static final String NUM_REGEX = "(-?\\d+(.\\d+)?)";
 
-  public static Function mapStringToFunction(String token) {
-    if (MULTI_VARIALBE_FUNCTION_MAP.containsKey(token)) {
-      return MULTI_VARIALBE_FUNCTION_MAP.get(token);
+  private Pattern pattern;
+
+  public FunctionMapper(List<FunctionDefinition> functionsList) {
+    multiVariableFunctionMap = new HashMap<>();
+    symbolOperatorMap = new HashMap<>();
+    functionToMaxArgMap = new HashMap<>();
+    functionToMethodMap = new HashMap<>();
+    functionToParamTypeMap = new HashMap<>();
+    ArrayList<String> patterns = new ArrayList<>();
+    patterns.add(NUM_REGEX);
+    patterns.add(SYMBOL_GROUPS);
+    patterns.add(",");
+
+    // Build multi-variable functions
+    for (FunctionDefinition functionDefinition : functionsList) {
+      // Map the symbol to the function
+      multiVariableFunctionMap.put(
+          functionDefinition.getSymbol(), functionDefinition.getFunction());
+
+      // Map the function to max-args.
+      functionToMaxArgMap.put(functionDefinition.getFunction(), functionDefinition.getMaxArgs());
+
+      // Add pattern
+      patterns.add(functionDefinition.getPattern());
+
+      // Add function value
+      functionToMethodMap.put(functionDefinition.getFunction(), getMethod(functionDefinition));
+
+      functionToParamTypeMap.put(
+          functionDefinition.getFunction(), functionDefinition.getMathMethod().getParamTypesList());
     }
-    if (SYMBOL_OPERATOR_MAP.containsKey(token)) {
-      return SYMBOL_OPERATOR_MAP.get(token);
+
+    // Build operators
+    symbolOperatorMap.put("+", Function.ADD);
+    functionToMaxArgMap.put(Function.ADD, 2);
+    symbolOperatorMap.put("-", Function.SUBTRACT);
+    functionToMaxArgMap.put(Function.SUBTRACT, 2);
+    symbolOperatorMap.put("*", Function.MULTIPLY);
+    functionToMaxArgMap.put(Function.MULTIPLY, 2);
+    symbolOperatorMap.put("/", Function.DIVIDE);
+    functionToMaxArgMap.put(Function.DIVIDE, 2);
+    symbolOperatorMap.put("%", Function.MOD);
+    functionToMaxArgMap.put(Function.MOD, 2);
+
+    pattern = Pattern.compile(String.join("|", patterns));
+  }
+
+  public List<ParamType> getParamTypeList(Function function) {
+    return functionToParamTypeMap.get(function);
+  }
+
+  public Map<Function, Method> getFunctionToMethodMap() {
+    return functionToMethodMap;
+  }
+
+  public Function mapStringToFunction(String token) {
+    if (multiVariableFunctionMap.containsKey(token)) {
+      return multiVariableFunctionMap.get(token);
+    }
+    if (symbolOperatorMap.containsKey(token)) {
+      return symbolOperatorMap.get(token);
     }
     return null;
   }
 
-  public static int getMaxArgs(Function function) {
-    return FUNCTION_TO_MAX_ARG_MAP.get(function);
+  public int getMaxArgs(Function function) {
+    return functionToMaxArgMap.get(function);
   }
 
-  public static boolean isMultiVariableFunction(String symbol) {
-    return MULTI_VARIALBE_FUNCTION_MAP.containsKey(symbol);
+  public boolean isMultiVariableFunction(String symbol) {
+    return multiVariableFunctionMap.containsKey(symbol);
   }
 
-  public static boolean isMultiVariableFunction(Function function) {
-    return MULTI_VARIALBE_FUNCTION_MAP.containsValue(function);
+  public boolean isMultiVariableFunction(Function function) {
+    return multiVariableFunctionMap.containsValue(function);
   }
 
-  public static boolean isSymbolFunction(String symbol) {
-    return SYMBOL_OPERATOR_MAP.containsKey(symbol);
+  public boolean isSymbolFunction(String symbol) {
+    return symbolOperatorMap.containsKey(symbol);
   }
 
-  public static boolean isSymbolFunction(Function function) {
-    return SYMBOL_OPERATOR_MAP.containsValue(function);
+  public boolean isSymbolFunction(Function function) {
+    return symbolOperatorMap.containsValue(function);
   }
 
-  // TODO(mark) Support non-spaced expressions
-  private static Map<String, Function> generateFunctionMap() {
-    HashMap<String, Function> tmp = new HashMap<>();
-    tmp.put("abs", Function.ABSOLUTE_VALUE);
-    tmp.put("sin", Function.SINE);
-    tmp.put("cos", Function.COSINE);
-    tmp.put("sqrt", Function.SQUARE_ROOT);
-    tmp.put("max", Function.MAX);
-    return tmp;
-  }
-
-  private static Map<String, Function> generateSymbolOperatorMap() {
-    HashMap<String, Function> tmp = new HashMap<>();
-    tmp.put("+", Function.ADD);
-    tmp.put("-", Function.SUBTRACT);
-    tmp.put("*", Function.MULTIPLY);
-    tmp.put("/", Function.DIVIDE);
-    tmp.put("%", Function.MOD);
-    return tmp;
-  }
-
-  public static Set<String> getAllSymbols() {
+  public Set<String> getAllSymbols() {
     Set<String> tmp = new HashSet<>();
-    tmp.addAll(MULTI_VARIALBE_FUNCTION_MAP.keySet());
-    tmp.addAll(SYMBOL_OPERATOR_MAP.keySet());
+    tmp.addAll(multiVariableFunctionMap.keySet());
+    tmp.addAll(symbolOperatorMap.keySet());
     return tmp;
   }
 
-  public static Pattern getPattern() {
-    ArrayList<String> patterns = new ArrayList<>();
-    patterns.add(numRegex);
-    patterns.add(SymbolGroups);
-    patterns.add(",");
-    patterns.addAll(MULTI_VARIALBE_FUNCTION_MAP.keySet());
-
-    return Pattern.compile(String.join("|", patterns));
+  public Pattern getPattern() {
+    return pattern;
   }
 
-  public static String getNumRegex() {
-    return numRegex;
+  public String getNumRegex() {
+    return NUM_REGEX;
   }
 
-  public static Map<Function, Integer> generateFunctionToMaxArgsMap() {
-    HashMap<Function, Integer> tmp = new HashMap<>();
-    tmp.put(Function.ADD, 2);
-    tmp.put(Function.SUBTRACT, 2);
-    tmp.put(Function.MULTIPLY, 2);
-    tmp.put(Function.DIVIDE, 2);
-    tmp.put(Function.INT_DIVIDE, 2);
-    tmp.put(Function.MOD, 2);
-    tmp.put(Function.POWER, 2);
-    tmp.put(Function.FACTORIAL, 1);
-    tmp.put(Function.ABSOLUTE_VALUE, 1);
-    tmp.put(Function.SINE, 1);
-    tmp.put(Function.COSINE, 1);
-    tmp.put(Function.SQUARE_ROOT, 1);
-    tmp.put(Function.MAX, Integer.MAX_VALUE);
-    return tmp;
+  private Method getMethod(FunctionDefinition functionDefinition) {
+    try {
+      List<Class> args = new ArrayList<>();
+      Class<?> c = Class.forName(functionDefinition.getMathMethod().getClassName());
+
+      for (ParamType param : functionDefinition.getMathMethod().getParamTypesList()) {
+        switch (param) {
+          case DECIMAL:
+            args.add(BigDecimal.class);
+            break;
+          case INTEGER:
+            args.add(BigInteger.class);
+            break;
+          case INTEGER_LIST:
+            args.add(List.class);
+          case DECIMAL_LIST:
+            args.add(List.class);
+        }
+      }
+
+      return c.getDeclaredMethod(
+          functionDefinition.getMathMethod().getMethodName(), args.toArray(Class[]::new));
+    } catch (ClassNotFoundException | NoSuchMethodException e) {
+      e.printStackTrace();
+    }
+
+    return null;
   }
 }

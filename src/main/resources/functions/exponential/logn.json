@@ -1,0 +1,13 @@
+{
+  "title": "LogN | Log base N",
+  "description": "Calculates the log base N of a value",
+  "pattern": "logn",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.ExponentialEvaluator",
+    "methodName": "logn",
+    "paramTypes": ["DECIMAL", "DECIMAL"]
+  },
+  "symbol": "logn",
+  "function": "LOGN",
+  "maxArgs": 2
+}
