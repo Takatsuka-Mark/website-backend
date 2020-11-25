@@ -1,0 +1,13 @@
+{
+  "title": "Absolute Value",
+  "description": "Finds the absolute value of the parameter",
+  "pattern": "abs",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
+    "methodName": "absoluteValue",
+    "paramTypes": ["DECIMAL"]
+  },
+  "symbol": "abs",
+  "function": "ABSOLUTE_VALUE",
+  "maxArgs": 1
+}

@@ -58,22 +58,9 @@ public class Evaluator {
             new BigDecimal(args.get(0)).divide(new BigDecimal(args.get(1)), mathContext));
       case MOD:
         return String.valueOf(new BigInteger(args.get(0)).mod(new BigInteger(args.get(1))));
-
-        // Mono Variable Functions (Excluding FAC)
-      case ABSOLUTE_VALUE:
-        return String.valueOf(new BigDecimal(args.get(0)).abs(mathContext));
-
-        // N Variable Functions
-        //      case MAX:
-        //        Optional<BigDecimal> result =
-        // args.stream().map(BigDecimal::new).max(BigDecimal::compareTo);
-        //        if (result.isPresent()) {
-        //          return result.get().toString();
-        //        } else {
-        //          return DEFAULT;
-        //        }
     }
 
+    // It is not a basic operation.
     Method method = methodMap.get(function);
     if (method.getDeclaringClass().equals(BasicEvaluator.class)) {
       List<Object> params = parseParams(args, functionMapper.getParamTypeList(function));
@@ -84,7 +71,6 @@ public class Evaluator {
       }
     }
 
-    // It is not a basic operation,
     return DEFAULT;
   }
 

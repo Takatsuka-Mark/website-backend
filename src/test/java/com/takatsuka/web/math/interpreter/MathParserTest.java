@@ -31,7 +31,7 @@ public class MathParserTest {
     FunctionMapper functionMapper = new FunctionMapper(functionLoader.loadFunctions());
     mathParser =
         new MathParser(
-            functionMapper); // TODO(mark): Figure out how to get the functions into here.
+            functionMapper);
   }
 
   @Test

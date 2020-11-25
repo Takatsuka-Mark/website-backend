@@ -33,4 +33,13 @@ public class BasicEvaluator {
     }
   }
 
+  public String min(List<BigDecimal> input) {
+    Optional<BigDecimal> result = input.stream().min(BigDecimal::compareTo);
+    if (result.isPresent()) {
+      return result.get().toString();
+    } else {
+      return defaultVal;
+    }
+  }
+
 }
