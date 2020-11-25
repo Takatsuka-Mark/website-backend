@@ -2,7 +2,6 @@ package com.takatsuka.web.math.evaluators;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 

@@ -133,4 +133,12 @@ public class MathParserTest_AllFunctions {
   public void testEvaluate_logN() {
 
   }
+
+  @Test
+  public void testEvaluate_rng() {
+    String expression = "rng(5, 100)";
+    String result = mathParser.evaluate(expression);
+    Truth.assertThat(Integer.parseInt(result)).isAtLeast(5);
+    Truth.assertThat(Integer.parseInt(result)).isLessThan(100);
+  }
 }
