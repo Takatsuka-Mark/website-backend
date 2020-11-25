@@ -118,4 +118,19 @@ public class MathParserTest_AllFunctions {
     String result = mathParser.evaluate(expression);
     Truth.assertThat(result).isEqualTo(expectedValue);
   }
+
+  @Test
+  public void testEvaluate_lg() {
+
+  }
+
+  @Test
+  public void testEvaluate_log() {
+
+  }
+
+  @Test
+  public void testEvaluate_logN() {
+
+  }
 }

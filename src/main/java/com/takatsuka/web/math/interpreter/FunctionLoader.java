@@ -1,6 +1,5 @@
 package com.takatsuka.web.math.interpreter;
 
-import com.google.protobuf.util.JsonFormat;
 import com.takatsuka.web.interpreter.FunctionDefinition;
 import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.utils.FileUtils;
@@ -30,7 +29,7 @@ public class FunctionLoader {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     List<File> files =
-        new Reflections("rules.functions", new ResourcesScanner())
+        new Reflections("functions/basic", new ResourcesScanner())
             .getResources(Pattern.compile(".*\\.json")).stream()
                 .map(resource -> new File(classLoader.getResource(resource).getFile()))
                 .collect(Collectors.toList());

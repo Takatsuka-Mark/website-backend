@@ -41,5 +41,4 @@ public class BasicEvaluator {
       return defaultVal;
     }
   }
-
 }
