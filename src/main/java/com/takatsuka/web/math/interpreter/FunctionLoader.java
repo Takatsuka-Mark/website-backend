@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Component
 public class FunctionLoader {
   private static final Logger logger = MathLogger.forCallingClass();
+  private static final Pattern filePattern = Pattern.compile(".*\\.json");
 
   FileUtils fileUtils;
 
@@ -30,7 +31,7 @@ public class FunctionLoader {
 
     List<File> files =
         new Reflections("functions/basic", new ResourcesScanner())
-            .getResources(Pattern.compile(".*\\.json")).stream()
+            .getResources(filePattern).stream()
                 .map(resource -> new File(classLoader.getResource(resource).getFile()))
                 .collect(Collectors.toList());
 

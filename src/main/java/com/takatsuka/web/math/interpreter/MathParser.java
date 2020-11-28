@@ -1,12 +1,11 @@
 package com.takatsuka.web.math.interpreter;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.takatsuka.web.interpreter.ExpressionEntry;
 import com.takatsuka.web.interpreter.Function;
 import com.takatsuka.web.logging.MathLogger;
 import org.slf4j.Logger;
-import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,7 +44,6 @@ public class MathParser {
   }
 
   public ArrayList<String> tokenize(String expression) {
-    // TODO could look for only positives, and interpret '-' as * -1
     Matcher m = regex.matcher(expression);
 
     ArrayList<String> tokens = new ArrayList<>();
@@ -54,20 +52,19 @@ public class MathParser {
       tokens.add(tok);
     }
 
+    logger.debug("Expression '{}' successfully tokenized to '{}'", expression, tokens.toString());
+
     return tokens;
   }
 
-  public Map<Integer, ExpressionEntry> loadTokensIntoTables(List<String> tokens) {
-    return loadTokensIntoTables(tokens, 0, 0);
-  }
-
   /** Step 1.0 */
-  private Map<Integer, ExpressionEntry> loadTokensIntoTables(
-      List<String> tokens, int currentFuncId, int currentPriority) {
+  @VisibleForTesting
+  protected Map<Integer, ExpressionEntry> loadTokensIntoTables(
+      List<String> tokens) {
     Queue<String> argBackup = new LinkedList<>();
     HashMap<Integer, ExpressionEntry> expressionTable = new HashMap<>();
-    int argPriority = currentPriority;
-    int funcId = currentFuncId;
+    int argPriority = 0;
+    int funcId = 0;
     int outstandingParams = 0;
 
     for (int i = 0; i < tokens.size(); i++) {

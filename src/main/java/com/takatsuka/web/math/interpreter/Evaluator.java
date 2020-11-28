@@ -4,6 +4,8 @@ import com.takatsuka.web.interpreter.Function;
 import com.takatsuka.web.interpreter.ParamType;
 import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.math.evaluators.BasicEvaluator;
+import com.takatsuka.web.math.evaluators.ExponentialEvaluator;
+import com.takatsuka.web.math.evaluators.RandomEvaluator;
 import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
@@ -14,8 +16,6 @@ import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class Evaluator {
   private static final Logger logger = MathLogger.forCallingClass();
@@ -23,6 +23,8 @@ public class Evaluator {
   private static final String DEFAULT = BigDecimal.ZERO.toString();
   private final MathContext mathContext;
   private final BasicEvaluator basicEvaluator;
+  private final RandomEvaluator randomEvaluator;
+  private final ExponentialEvaluator exponentialEvaluator;
   private final Map<Function, Method> methodMap;
   private final FunctionMapper functionMapper;
 
@@ -33,11 +35,15 @@ public class Evaluator {
   public Evaluator(int precision, FunctionMapper functionMapper) {
     mathContext = new MathContext(precision);
     basicEvaluator = new BasicEvaluator(mathContext, DEFAULT);
+    randomEvaluator = new RandomEvaluator(mathContext, DEFAULT);
+    exponentialEvaluator = new ExponentialEvaluator(mathContext, DEFAULT);
     this.functionMapper = functionMapper;
     this.methodMap = functionMapper.getFunctionToMethodMap();
   }
 
   public String evaluateFunction(Function function, List<String> args) {
+    logger.debug("Evaluating function '{}' with args '{}'", function, args.toString());
+
     switch (function) {
       case UNKNOWN_FUNCTION:
         // The function is unknown, just return the args if available.
@@ -58,34 +64,47 @@ public class Evaluator {
             new BigDecimal(args.get(0)).divide(new BigDecimal(args.get(1)), mathContext));
       case MOD:
         return String.valueOf(new BigInteger(args.get(0)).mod(new BigInteger(args.get(1))));
+      case POWER:
+        return String.valueOf(
+            new BigInteger(args.get(0)).pow(Integer.parseInt(args.get(1))));
     }
 
     // It is not a basic operation.
     Method method = methodMap.get(function);
     if (method.getDeclaringClass().equals(BasicEvaluator.class)) {
-      List<Object> params = parseParams(args, functionMapper.getParamTypeList(function));
-      try {
-        return method.invoke(basicEvaluator, params.toArray()).toString();
-      } catch (IllegalAccessException | InvocationTargetException e) {
-        e.printStackTrace();
-      }
+      return evaluateDynamicFunction(basicEvaluator, method, function, args);
+    } else if (method.getDeclaringClass().equals(RandomEvaluator.class)) {
+      return evaluateDynamicFunction(randomEvaluator, method, function, args);
+    } else if (method.getDeclaringClass().equals(ExponentialEvaluator.class)) {
+      return evaluateDynamicFunction(exponentialEvaluator, method, function, args);
     }
 
     return DEFAULT;
+  }
+
+  private String evaluateDynamicFunction(
+      Object executorClass, Method method, Function function, List<String> args) {
+    List<Object> params = parseParams(args, functionMapper.getParamTypeList(function));
+    try {
+      return method.invoke(executorClass, params.toArray()).toString();
+    } catch (IllegalAccessException | InvocationTargetException e) {
+      e.printStackTrace();
+      throw new RuntimeException("Could not evaluate the function");
+    }
   }
 
   private List<Object> parseParams(List<String> args, List<ParamType> paramTypes) {
     List<Object> finalArgs = new ArrayList<>();
 
     // Cover the n param functions.
-    if(paramTypes.get(0) == ParamType.DECIMAL_LIST){
+    if (paramTypes.get(0) == ParamType.DECIMAL_LIST) {
       List<BigDecimal> argsList = new ArrayList<>();
       for (String arg : args) {
-          argsList.add(new BigDecimal(arg));
+        argsList.add(new BigDecimal(arg));
       }
       finalArgs.add(argsList);
       return finalArgs;
-    } else if(paramTypes.get(0) == ParamType.INTEGER_LIST) {
+    } else if (paramTypes.get(0) == ParamType.INTEGER_LIST) {
       List<BigInteger> argsList = new ArrayList<>();
       for (String arg : args) {
         argsList.add(new BigInteger(arg));

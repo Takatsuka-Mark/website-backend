@@ -17,17 +17,15 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 public class FunctionMapper {
+  private static final String SYMBOL_GROUPS = "([+\\-*/%^!()])";
+  private static final String NUM_REGEX = "(-?\\d+(.\\d+)?)";
 
   private final Map<String, Function> multiVariableFunctionMap;
   private final Map<String, Function> symbolOperatorMap;
   private final Map<Function, Integer> functionToMaxArgMap;
   private final Map<Function, Method> functionToMethodMap;
   private final Map<Function, List<ParamType>> functionToParamTypeMap;
-
-  private static final String SYMBOL_GROUPS = "([+\\-*/%^!()])";
-  private static final String NUM_REGEX = "(-?\\d+(.\\d+)?)";
-
-  private Pattern pattern;
+  private final Pattern pattern;
 
   public FunctionMapper(List<FunctionDefinition> functionsList) {
     multiVariableFunctionMap = new HashMap<>();
@@ -70,6 +68,8 @@ public class FunctionMapper {
     functionToMaxArgMap.put(Function.DIVIDE, 2);
     symbolOperatorMap.put("%", Function.MOD);
     functionToMaxArgMap.put(Function.MOD, 2);
+    symbolOperatorMap.put("^", Function.POWER);
+    functionToMaxArgMap.put(Function.POWER, 2);
 
     pattern = Pattern.compile(String.join("|", patterns));
   }

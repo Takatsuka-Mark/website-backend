@@ -1,6 +1,7 @@
 package com.takatsuka.web.math.evaluators;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 
 public class ExponentialEvaluator {
@@ -24,5 +25,9 @@ public class ExponentialEvaluator {
 
   public String logn(BigDecimal base, BigDecimal value) {
     return "Needs implementation.";
+  }
+
+  public String modPow(BigInteger base, BigInteger exp, BigInteger mod) {
+    return String.valueOf(base.modPow(exp, mod));
   }
 }
