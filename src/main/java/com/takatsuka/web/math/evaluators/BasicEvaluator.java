@@ -15,15 +15,15 @@ public class BasicEvaluator {
     this.defaultVal = defaultVal;
   }
 
-  public String absoluteValue(BigDecimal input){
+  public String absoluteValue(BigDecimal input) {
     return String.valueOf(input.abs(mathContext));
   }
 
-  public String squareRoot(BigDecimal input){
+  public String squareRoot(BigDecimal input) {
     return String.valueOf(input.sqrt(mathContext));
   }
 
-  public String max(List<BigDecimal> input){
+  public String max(List<BigDecimal> input) {
     Optional<BigDecimal> result = input.stream().max(BigDecimal::compareTo);
     if (result.isPresent()) {
       return result.get().toString();
@@ -39,5 +39,13 @@ public class BasicEvaluator {
     } else {
       return defaultVal;
     }
+  }
+
+  public String gcd(List<BigDecimal> input) {
+    return null; // TODO(mark): Implement this
+  }
+
+  public String lcm(List<BigDecimal> input) {
+    return null; // TODO(mark): Implement this
   }
 }

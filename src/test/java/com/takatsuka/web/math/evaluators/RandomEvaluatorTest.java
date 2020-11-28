@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Random;
 
-public class RandomEvaluatorTester {
+public class RandomEvaluatorTest {
 
   private RandomEvaluator randomEvaluator;
   private Random random;
@@ -32,7 +32,4 @@ public class RandomEvaluatorTester {
     Truth.assertThat(result).isAtLeast(min);
     Truth.assertThat(result).isLessThan(max);
   }
-
-  @Test
-  public void testRandomFloat() {}
 }

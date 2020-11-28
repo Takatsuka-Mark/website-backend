@@ -89,5 +89,6 @@ enum Function {
     COTANGENT_HYPERBOLIC = 40;
     GCD = 41;
     LCM = 42;
-
+    ROUND = 43;
+    MOD_POWER = 44;
 }

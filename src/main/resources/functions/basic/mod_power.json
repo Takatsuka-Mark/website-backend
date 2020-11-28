@@ -1,0 +1,13 @@
+{
+  "title": "Mod Power",
+  "description": "Finds the value of the (base ^ exponent) % mod",
+  "pattern": "modPow",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.ExponentialEvaluator",
+    "methodName": "modPow",
+    "paramTypes": ["INTEGER", "INTEGER", "INTEGER"]
+  },
+  "symbol": "modPow",
+  "function": "MOD_POWER",
+  "maxArgs": 3
+}
