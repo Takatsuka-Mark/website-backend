@@ -5,7 +5,7 @@ option java_multiple_files = true;
 
 package interpreter;
 
-import "tables.proto";
+import "math/tables.proto";
 
 message FunctionDefinition{
     string title = 1;
