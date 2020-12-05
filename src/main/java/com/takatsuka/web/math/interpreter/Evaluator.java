@@ -6,6 +6,7 @@ import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.math.evaluators.BasicEvaluator;
 import com.takatsuka.web.math.evaluators.ExponentialEvaluator;
 import com.takatsuka.web.math.evaluators.RandomEvaluator;
+import com.takatsuka.web.math.evaluators.TrigEvaluator;
 import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +26,7 @@ public class Evaluator {
   private final BasicEvaluator basicEvaluator;
   private final RandomEvaluator randomEvaluator;
   private final ExponentialEvaluator exponentialEvaluator;
+  private final TrigEvaluator trigEvaluator;
   private final Map<Function, Method> methodMap;
   private final FunctionMapper functionMapper;
 
@@ -37,6 +39,7 @@ public class Evaluator {
     basicEvaluator = new BasicEvaluator(mathContext, DEFAULT);
     randomEvaluator = new RandomEvaluator(mathContext, DEFAULT);
     exponentialEvaluator = new ExponentialEvaluator(mathContext, DEFAULT);
+    trigEvaluator = new TrigEvaluator(mathContext, DEFAULT);
     this.functionMapper = functionMapper;
     this.methodMap = functionMapper.getFunctionToMethodMap();
   }
@@ -77,6 +80,8 @@ public class Evaluator {
       return evaluateDynamicFunction(randomEvaluator, method, function, args);
     } else if (method.getDeclaringClass().equals(ExponentialEvaluator.class)) {
       return evaluateDynamicFunction(exponentialEvaluator, method, function, args);
+    } else if (method.getDeclaringClass().equals(TrigEvaluator.class)) {
+      return evaluateDynamicFunction(trigEvaluator, method, function, args);
     }
 
     return DEFAULT;

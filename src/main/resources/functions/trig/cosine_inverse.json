@@ -1,0 +1,13 @@
+{
+  "title": "Arc Cosine",
+  "description": "Calculates the Arc Cosine of a number",
+  "pattern": "acos",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
+    "methodName": "acos",
+    "paramTypes": ["DECIMAL"]
+  },
+  "symbol": "acos",
+  "function": "COSINE_INVERSE",
+  "maxArgs": 1
+}

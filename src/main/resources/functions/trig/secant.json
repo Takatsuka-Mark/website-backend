@@ -1,0 +1,13 @@
+{
+  "title": "Secant",
+  "description": "Calculates the Secant of a number",
+  "pattern": "sec",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
+    "methodName": "sec",
+    "paramTypes": ["DECIMAL"]
+  },
+  "symbol": "sec",
+  "function": "SECANT",
+  "maxArgs": 1
+}

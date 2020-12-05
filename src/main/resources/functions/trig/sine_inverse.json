@@ -1,0 +1,13 @@
+{
+  "title": "Arc Sine",
+  "description": "Calculates the Arc Sin of a number",
+  "pattern": "asin",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
+    "methodName": "asin",
+    "paramTypes": ["DECIMAL"]
+  },
+  "symbol": "asin",
+  "function": "SINE_INVERSE",
+  "maxArgs": 1
+}

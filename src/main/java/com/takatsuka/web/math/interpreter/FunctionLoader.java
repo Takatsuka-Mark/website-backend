@@ -35,6 +35,9 @@ public class FunctionLoader {
     files.addAll(
         new Reflections("functions/exponential", new ResourcesScanner()).getResources(filePattern));
 
+    files.addAll(
+        new Reflections("functions/trig", new ResourcesScanner()).getResources(filePattern));
+
     logger.info("Found '{}' rules to load: {}", files.size(), Arrays.toString(files.toArray()));
 
     List<FunctionDefinition> loadedFunctions = new ArrayList<>();

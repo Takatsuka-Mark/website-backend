@@ -1,0 +1,13 @@
+{
+  "title": "Arc Cotangent",
+  "description": "Calculates the Arc Cotangent of a number",
+  "pattern": "acot",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
+    "methodName": "acot",
+    "paramTypes": ["DECIMAL"]
+  },
+  "symbol": "acot",
+  "function": "COTANGENT_INVERSE",
+  "maxArgs": 1
+}
