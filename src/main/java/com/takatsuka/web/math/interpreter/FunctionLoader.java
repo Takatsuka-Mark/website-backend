@@ -8,12 +8,12 @@ import org.reflections.scanners.ResourcesScanner;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Component
 public class FunctionLoader {
@@ -29,18 +29,19 @@ public class FunctionLoader {
   public List<FunctionDefinition> loadFunctions() {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-    List<File> files =
-        new Reflections("functions/basic", new ResourcesScanner())
-            .getResources(filePattern).stream()
-                .map(resource -> new File(classLoader.getResource(resource).getFile()))
-                .collect(Collectors.toList());
+    Set<String> files =
+        new Reflections("functions/basic", new ResourcesScanner()).getResources(filePattern);
+
+    files.addAll(
+        new Reflections("functions/exponential", new ResourcesScanner()).getResources(filePattern));
 
     logger.info("Found '{}' rules to load: {}", files.size(), Arrays.toString(files.toArray()));
 
     List<FunctionDefinition> loadedFunctions = new ArrayList<>();
 
-    for (File file : files) {
-      loadedFunctions.add(fileUtils.readFunctionFromJson(file));
+    for (String file : files) {
+      InputStream stream = classLoader.getResourceAsStream(file);
+      loadedFunctions.add(fileUtils.readFunctionFromJson(stream));
     }
 
     return loadedFunctions;

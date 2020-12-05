@@ -5,7 +5,7 @@
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.ExponentialEvaluator",
     "methodName": "modPow",
-    "paramTypes": ["INTEGER", "INTEGER", "INTEGER"]
+    "paramTypes": ["BIG_INTEGER", "BIG_INTEGER", "BIG_INTEGER"]
   },
   "symbol": "modPow",
   "function": "MOD_POWER",

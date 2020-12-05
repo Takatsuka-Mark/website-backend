@@ -5,7 +5,7 @@
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.ExponentialEvaluator",
     "methodName": "log",
-    "paramTypes": ["DECIMAL"]
+    "paramTypes": ["BIG_DECIMAL"]
   },
   "symbol": "log",
   "function": "LOG",

@@ -5,7 +5,7 @@
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
     "methodName": "max",
-    "paramTypes": ["DECIMAL_LIST"]
+    "paramTypes": ["BIG_DECIMAL_LIST"]
   },
   "symbol": "max",
   "function": "MAX",

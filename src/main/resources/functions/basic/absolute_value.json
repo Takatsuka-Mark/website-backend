@@ -5,7 +5,7 @@
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
     "methodName": "absoluteValue",
-    "paramTypes": ["DECIMAL"]
+    "paramTypes": ["BIG_DECIMAL"]
   },
   "symbol": "abs",
   "function": "ABSOLUTE_VALUE",

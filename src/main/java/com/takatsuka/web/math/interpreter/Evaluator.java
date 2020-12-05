@@ -97,14 +97,14 @@ public class Evaluator {
     List<Object> finalArgs = new ArrayList<>();
 
     // Cover the n param functions.
-    if (paramTypes.get(0) == ParamType.DECIMAL_LIST) {
+    if (paramTypes.get(0) == ParamType.BIG_DECIMAL_LIST) {
       List<BigDecimal> argsList = new ArrayList<>();
       for (String arg : args) {
         argsList.add(new BigDecimal(arg));
       }
       finalArgs.add(argsList);
       return finalArgs;
-    } else if (paramTypes.get(0) == ParamType.INTEGER_LIST) {
+    } else if (paramTypes.get(0) == ParamType.BIG_INTEGER_LIST) {
       List<BigInteger> argsList = new ArrayList<>();
       for (String arg : args) {
         argsList.add(new BigInteger(arg));
@@ -124,9 +124,15 @@ public class Evaluator {
 
       switch (paramType) {
         case DECIMAL:
-          finalArgs.add(new BigDecimal(args.get(i)));
+          finalArgs.add(Double.valueOf(args.get(i)));
           break;
         case INTEGER:
+          finalArgs.add(Integer.parseInt(args.get(i)));
+          break;
+        case BIG_DECIMAL:
+          finalArgs.add(new BigDecimal(args.get(i)));
+          break;
+        case BIG_INTEGER:
           finalArgs.add(new BigInteger(args.get(i)));
           break;
       }

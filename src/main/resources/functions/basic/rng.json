@@ -5,7 +5,7 @@
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.RandomEvaluator",
     "methodName": "randomInt",
-    "paramTypes": ["INTEGER", "INTEGER"]
+    "paramTypes": ["BIG_INTEGER", "BIG_INTEGER"]
   },
   "symbol": "rng",
   "function": "RNG",

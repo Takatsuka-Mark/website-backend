@@ -135,15 +135,23 @@ public class FunctionMapper {
       for (ParamType param : functionDefinition.getMathMethod().getParamTypesList()) {
         switch (param) {
           case DECIMAL:
-            args.add(BigDecimal.class);
+            args.add(Double.class);
             break;
           case INTEGER:
+            args.add(Integer.class);
+            break;
+          case BIG_DECIMAL:
+            args.add(BigDecimal.class);
+            break;
+          case BIG_INTEGER:
             args.add(BigInteger.class);
             break;
           case INTEGER_LIST:
-            args.add(List.class);
           case DECIMAL_LIST:
+          case BIG_INTEGER_LIST:
+          case BIG_DECIMAL_LIST:
             args.add(List.class);
+            break;
         }
       }
 

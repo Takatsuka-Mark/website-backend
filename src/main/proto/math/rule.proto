@@ -39,4 +39,8 @@ enum ParamType{
     DECIMAL = 2;
     INTEGER_LIST = 3;
     DECIMAL_LIST = 4;
+    BIG_INTEGER = 5;
+    BIG_DECIMAL = 6;
+    BIG_INTEGER_LIST = 7;
+    BIG_DECIMAL_LIST = 8;
 }

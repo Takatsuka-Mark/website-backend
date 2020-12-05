@@ -9,7 +9,7 @@ BUCKET=$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/at
 echo "Project ID: ${PROJECTID} Bucket: ${BUCKET}"
 
 # Get the files we need
-gsutil cp -r gs://"${BUCKET}"/ .
+gsutil cp -r gs://"${BUCKET}"/build001.jar .
 
 # Install dependencies
 apt-get update
@@ -19,5 +19,4 @@ apt-get -y --force-yes install openjdk-11-jdk
 update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/jre/bin/java
 
 # Start server
-cd ./website-backend-001
-java -jar web-0.0.1-SNAPSHOT.jar
+java -jar build001.jar
