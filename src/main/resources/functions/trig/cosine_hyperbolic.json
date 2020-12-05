@@ -1,0 +1,13 @@
+{
+  "title": "Hyperbolic Cosine",
+  "description": "Calculates the Hyperbolic Cosine of a number",
+  "pattern": "cosh",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
+    "methodName": "cosh",
+    "paramTypes": ["DECIMAL"]
+  },
+  "symbol": "cosh",
+  "function": "COSINE_HYPERBOLIC",
+  "maxArgs": 1
+}

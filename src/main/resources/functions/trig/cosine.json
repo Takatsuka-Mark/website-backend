@@ -1,0 +1,13 @@
+{
+  "title": "Cosine",
+  "description": "Calculates the Cosine of a number",
+  "pattern": "cos",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
+    "methodName": "cos",
+    "paramTypes": ["DECIMAL"]
+  },
+  "symbol": "cos",
+  "function": "COSECANT",
+  "maxArgs": 1
+}

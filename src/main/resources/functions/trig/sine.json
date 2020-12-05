@@ -1,0 +1,13 @@
+{
+  "title": "Sine",
+  "description": "Calculates the Sin of a number",
+  "pattern": "sin",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
+    "methodName": "sin",
+    "paramTypes": ["DECIMAL"]
+  },
+  "symbol": "sin",
+  "function": "SINE",
+  "maxArgs": 1
+}

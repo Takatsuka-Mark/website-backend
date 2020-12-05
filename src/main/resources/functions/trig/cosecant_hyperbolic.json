@@ -1,0 +1,13 @@
+{
+  "title": "Hyperbolic Cosecant",
+  "description": "Calculates the Hyperbolic Cosecant of a number",
+  "pattern": "csch",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
+    "methodName": "csch",
+    "paramTypes": ["DECIMAL"]
+  },
+  "symbol": "csch",
+  "function": "COSECANT_HYPERBOLIC",
+  "maxArgs": 1
+}

@@ -1,0 +1,13 @@
+{
+  "title": "Hyperbolic Tangent",
+  "description": "Calculates the Hyperbolic Tangent of a number",
+  "pattern": "tanh",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
+    "methodName": "tanh",
+    "paramTypes": ["DECIMAL"]
+  },
+  "symbol": "tanh",
+  "function": "TANGENT_HYPERBOLIC",
+  "maxArgs": 1
+}
