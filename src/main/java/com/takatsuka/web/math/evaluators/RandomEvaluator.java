@@ -1,5 +1,7 @@
 package com.takatsuka.web.math.evaluators;
 
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -8,12 +10,10 @@ import java.util.Random;
 public class RandomEvaluator {
 
   private final MathContext mathContext;
-  private final String defaultVal;
   private final Random randomSource;
 
-  public RandomEvaluator(MathContext mathContext, String defaultVal) {
+  public RandomEvaluator(MathContext mathContext) {
     this.mathContext = mathContext;
-    this.defaultVal = defaultVal;
     this.randomSource = new Random();
   }
 

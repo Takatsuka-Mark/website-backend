@@ -1,18 +1,21 @@
 package com.takatsuka.web.math.evaluators;
 
+import com.takatsuka.web.math.interpreter.Evaluator;
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 public class BasicEvaluator {
 
   private final MathContext mathContext;
-  private final String defaultVal;
 
-  public BasicEvaluator(MathContext mathContext, String defaultVal) {
+  public BasicEvaluator(MathContext mathContext) {
     this.mathContext = mathContext;
-    this.defaultVal = defaultVal;
   }
 
   public String absoluteValue(BigDecimal input) {
@@ -28,7 +31,7 @@ public class BasicEvaluator {
     if (result.isPresent()) {
       return result.get().toString();
     } else {
-      return defaultVal;
+      return Evaluator.DEFAULT;
     }
   }
 
@@ -37,15 +40,34 @@ public class BasicEvaluator {
     if (result.isPresent()) {
       return result.get().toString();
     } else {
-      return defaultVal;
+      return Evaluator.DEFAULT;
     }
   }
 
-  public String gcd(List<BigDecimal> input) {
-    return null; // TODO(mark): Implement this
+  public String gcd(List<BigInteger> input) {
+    return gcdEuclidean(input).toString();
   }
 
-  public String lcm(List<BigDecimal> input) {
-    return null; // TODO(mark): Implement this
+  public String lcm(List<BigInteger> input) {
+    return "0.0"; // TODO(mark): Implement this
+  }
+
+  public BigInteger gcdEuclidean(List<BigInteger> input) {
+    BigInteger result = input.get(0);
+    for (int i = 1; i < input.size(); i++) {
+      result = gcdEuclidean(input.get(i), result);
+    }
+
+    return result;
+  }
+
+  public BigInteger gcdEuclidean(BigInteger A, BigInteger B){
+    if(A.equals(BigInteger.ZERO)) {
+      return B;
+    } else if(B.equals(BigInteger.ZERO)) {
+      return A;
+    }
+
+    return gcdEuclidean(B, A.mod(B));
   }
 }

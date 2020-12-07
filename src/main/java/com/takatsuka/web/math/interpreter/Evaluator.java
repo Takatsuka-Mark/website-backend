@@ -21,7 +21,7 @@ import java.util.Map;
 public class Evaluator {
   private static final Logger logger = MathLogger.forCallingClass();
 
-  private static final String DEFAULT = BigDecimal.ZERO.toString();
+  public static final String DEFAULT = BigDecimal.ZERO.toString();
   private final MathContext mathContext;
   private final BasicEvaluator basicEvaluator;
   private final RandomEvaluator randomEvaluator;
@@ -36,10 +36,10 @@ public class Evaluator {
 
   public Evaluator(int precision, FunctionMapper functionMapper) {
     mathContext = new MathContext(precision);
-    basicEvaluator = new BasicEvaluator(mathContext, DEFAULT);
-    randomEvaluator = new RandomEvaluator(mathContext, DEFAULT);
-    exponentialEvaluator = new ExponentialEvaluator(mathContext, DEFAULT);
-    trigEvaluator = new TrigEvaluator(mathContext, DEFAULT);
+    basicEvaluator = new BasicEvaluator(mathContext);
+    randomEvaluator = new RandomEvaluator(mathContext);
+    exponentialEvaluator = new ExponentialEvaluator(mathContext);
+    trigEvaluator = new TrigEvaluator(mathContext);
     this.functionMapper = functionMapper;
     this.methodMap = functionMapper.getFunctionToMethodMap();
   }

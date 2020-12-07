@@ -7,8 +7,10 @@ import com.takatsuka.web.math.interpreter.FunctionMapper;
 import com.takatsuka.web.math.interpreter.MathParser;
 import com.takatsuka.web.math.interpreter.FunctionLoader;
 import org.slf4j.Logger;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
+import java.math.MathContext;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,10 +20,12 @@ import java.util.concurrent.TimeoutException;
 @Service
 public class MathService {
   private static final Logger logger = MathLogger.forCallingClass();
-  private static final int EXEC_TIME_LIMIT = 5; // Time in seconds to allow execution
+  private static final int EXEC_TIME_LIMIT = 10; // Time in seconds to allow execution
 
   private final MathParser mathParser;
   private final SimpleTimeLimiter simpleTimeLimiter;
+
+  private int precision = 10;
 
   MathService(FunctionLoader functionLoader) {
     FunctionMapper functionMapper = new FunctionMapper(functionLoader.loadFunctions());
@@ -65,5 +69,18 @@ public class MathService {
     public String call() {
       return mathParser.evaluate(expression);
     }
+  }
+
+  public void setPrecision(int newPrecision) {
+    precision = newPrecision;
+  }
+
+  public int getPrecision() {
+    return precision;
+  }
+
+  @Bean
+  public MathContext generateMathContext() {
+    return new MathContext(precision);
   }
 }

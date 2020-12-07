@@ -14,7 +14,7 @@ public class BasicEvaluatorTest {
 
   @Before
   public void init() {
-    basicEvaluator = new BasicEvaluator(new MathContext(100), "0");
+    basicEvaluator = new BasicEvaluator(new MathContext(100));
   }
 
   @Test
