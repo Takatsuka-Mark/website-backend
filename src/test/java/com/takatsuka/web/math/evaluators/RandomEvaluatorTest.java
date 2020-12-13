@@ -15,7 +15,7 @@ public class RandomEvaluatorTest {
 
   @Before
   public void init() {
-    randomEvaluator = new RandomEvaluator(new MathContext(100), "0");
+    randomEvaluator = new RandomEvaluator(new MathContext(100));
     random = new Random();
   }
 

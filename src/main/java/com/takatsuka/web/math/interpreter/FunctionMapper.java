@@ -34,6 +34,7 @@ public class FunctionMapper {
     functionToMethodMap = new HashMap<>();
     functionToParamTypeMap = new HashMap<>();
     ArrayList<String> patterns = new ArrayList<>();
+    patterns.add("//");   // Add integer division as so it is not parsed as two '/'
     patterns.add(NUM_REGEX);
     patterns.add(SYMBOL_GROUPS);
     patterns.add(",");
@@ -58,6 +59,8 @@ public class FunctionMapper {
     }
 
     // Build operators
+    symbolOperatorMap.put("//", Function.INT_DIVIDE);
+    functionToMaxArgMap.put(Function.INT_DIVIDE, 2);
     symbolOperatorMap.put("+", Function.ADD);
     functionToMaxArgMap.put(Function.ADD, 2);
     symbolOperatorMap.put("-", Function.SUBTRACT);
@@ -70,6 +73,8 @@ public class FunctionMapper {
     functionToMaxArgMap.put(Function.MOD, 2);
     symbolOperatorMap.put("^", Function.POWER);
     functionToMaxArgMap.put(Function.POWER, 2);
+    symbolOperatorMap.put("!", Function.FACTORIAL); // TODO(Mark): Added this.
+    functionToMaxArgMap.put(Function.FACTORIAL, 1);
 
     pattern = Pattern.compile(String.join("|", patterns));
   }

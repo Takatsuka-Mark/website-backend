@@ -1,0 +1,13 @@
+{
+  "title": "Least Common Multiple",
+  "description": "Finds the least common multiple in the set of parameters",
+  "pattern": "lcm",
+  "mathMethod": {
+    "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
+    "methodName": "lcm",
+    "paramTypes": ["BIG_INTEGER_LIST"]
+  },
+  "symbol": "lcm",
+  "function": "LCM",
+  "maxArgs": 2147483647
+}

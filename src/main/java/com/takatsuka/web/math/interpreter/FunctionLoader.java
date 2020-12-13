@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
 public class FunctionLoader {
   private static final Logger logger = MathLogger.forCallingClass();
   private static final Pattern filePattern = Pattern.compile(".*\\.json");
+  private static final List<String> FUNCTION_PATHS = getFilePaths();
 
   FileUtils fileUtils;
 
@@ -29,14 +31,10 @@ public class FunctionLoader {
   public List<FunctionDefinition> loadFunctions() {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-    Set<String> files =
-        new Reflections("functions/basic", new ResourcesScanner()).getResources(filePattern);
-
-    files.addAll(
-        new Reflections("functions/exponential", new ResourcesScanner()).getResources(filePattern));
-
-    files.addAll(
-        new Reflections("functions/trig", new ResourcesScanner()).getResources(filePattern));
+    Set<String> files = new HashSet<>();
+    for (String path : FUNCTION_PATHS) {
+      files.addAll(new Reflections(path, new ResourcesScanner()).getResources(filePattern));
+    }
 
     logger.info("Found '{}' rules to load: {}", files.size(), Arrays.toString(files.toArray()));
 
@@ -48,5 +46,9 @@ public class FunctionLoader {
     }
 
     return loadedFunctions;
+  }
+
+  private static List<String> getFilePaths() {
+    return List.of("functions/basic", "functions/exponential", "functions/trig");
   }
 }

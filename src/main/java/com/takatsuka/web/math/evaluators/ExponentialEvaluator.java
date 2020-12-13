@@ -1,5 +1,7 @@
 package com.takatsuka.web.math.evaluators;
 
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -8,11 +10,9 @@ public class ExponentialEvaluator {
 
   private static final BigDecimal TWO = BigDecimal.ONE.add(BigDecimal.ONE);
   private final MathContext mathContext;
-  private final String defaultVal;
 
-  public ExponentialEvaluator(MathContext mathContext, String defaultVal) {
+  public ExponentialEvaluator(MathContext mathContext) {
     this.mathContext = mathContext;
-    this.defaultVal = defaultVal;
   }
 
   public String lg(BigDecimal input){
