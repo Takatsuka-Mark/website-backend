@@ -1,5 +1,6 @@
 package com.takatsuka.web.math.interpreter;
 
+import com.google.common.math.BigIntegerMath;
 import com.takatsuka.web.interpreter.Function;
 import com.takatsuka.web.interpreter.ParamType;
 import com.takatsuka.web.logging.MathLogger;
@@ -68,8 +69,11 @@ public class Evaluator {
       case MOD:
         return String.valueOf(new BigInteger(args.get(0)).mod(new BigInteger(args.get(1))));
       case POWER:
-        return String.valueOf(
-            new BigInteger(args.get(0)).pow(Integer.parseInt(args.get(1))));
+        return String.valueOf(new BigInteger(args.get(0)).pow(Integer.parseInt(args.get(1))));
+      case FACTORIAL:
+        return String.valueOf(BigIntegerMath.factorial(Integer.parseInt(args.get(0))));
+      case INT_DIVIDE:
+        return String.valueOf(new BigInteger(args.get(0)).divide(new BigInteger(args.get(1))));
     }
 
     // It is not a basic operation.

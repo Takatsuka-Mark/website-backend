@@ -49,7 +49,14 @@ public class MathParserTest_AllFunctions {
 
   @Test
   public void testEvaluate_intDivide() {
-    // TODO(mark): Implement
+    // Test round down
+    String expectedValue = "1";
+    String result = mathParser.evaluate("11 // 10");
+    Truth.assertThat(result).isEqualTo(expectedValue);
+
+    // Test lack of round up
+    result = mathParser.evaluate("19 // 10");
+    Truth.assertThat(result).isEqualTo(expectedValue);
   }
 
   @Test
@@ -66,7 +73,15 @@ public class MathParserTest_AllFunctions {
 
   @Test
   public void testEvaluate_factorial() {
-    // TODO(mark): Implement
+    // Test basic case
+    String expectedValue = "120";
+    String result = mathParser.evaluate("5!");
+    Truth.assertThat(result).isEqualTo(expectedValue);
+
+    // Test more complex param parsing.
+    expectedValue = "121";
+    result = mathParser.evaluate("5! + 1");
+    Truth.assertThat(result).isEqualTo(expectedValue);
   }
 
   @Test
@@ -121,18 +136,22 @@ public class MathParserTest_AllFunctions {
 
   @Test
   public void testEvaluate_lg() {
-
+    // TODO(mark): Implement this
+    //    String expectedValue = "6";
+    //    String result = mathParser.evaluate("lg(64)");
+    //    Truth.assertThat(result).isEqualTo(expectedValue);
   }
 
   @Test
   public void testEvaluate_log() {
-
+    // TODO(mark): Implement this
+    //    String expectedValue = "6";
+    //    String result = mathParser.evaluate("log(1000000)");
+    //    Truth.assertThat(result).isEqualTo(expectedValue);
   }
 
   @Test
-  public void testEvaluate_logN() {
-
-  }
+  public void testEvaluate_logN() {}
 
   @Test
   public void testEvaluate_rng() {

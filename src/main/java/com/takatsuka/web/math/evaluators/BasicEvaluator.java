@@ -48,11 +48,7 @@ public class BasicEvaluator {
     return gcdEuclidean(input).toString();
   }
 
-  public String lcm(List<BigInteger> input) {
-    return "0.0"; // TODO(mark): Implement this
-  }
-
-  public BigInteger gcdEuclidean(List<BigInteger> input) {
+  private BigInteger gcdEuclidean(List<BigInteger> input) {
     BigInteger result = input.get(0);
     for (int i = 1; i < input.size(); i++) {
       result = gcdEuclidean(input.get(i), result);
@@ -61,13 +57,26 @@ public class BasicEvaluator {
     return result;
   }
 
-  public BigInteger gcdEuclidean(BigInteger A, BigInteger B){
-    if(A.equals(BigInteger.ZERO)) {
+  private BigInteger gcdEuclidean(BigInteger A, BigInteger B) {
+    if (A.equals(BigInteger.ZERO)) {
       return B;
-    } else if(B.equals(BigInteger.ZERO)) {
+    } else if (B.equals(BigInteger.ZERO)) {
       return A;
     }
 
     return gcdEuclidean(B, A.mod(B));
+  }
+
+  public String lcm(List<BigInteger> input) {
+    return lcmThroughGcd(input).toString();
+  }
+
+  private BigInteger lcmThroughGcd(List<BigInteger> input) {
+    BigInteger result = input.get(0);
+    for (int i = 1; i < input.size(); i++) {
+      result = (input.get(i).multiply(result)).divide(gcdEuclidean(input.get(i), result));
+    }
+
+    return result;
   }
 }
