@@ -59,7 +59,7 @@ public class MathService {
     return result;
   }
 
-  public class DoEval implements Callable<String> {
+  private class DoEval implements Callable<String> {
     private final String expression;
 
     public DoEval(String expression) {
