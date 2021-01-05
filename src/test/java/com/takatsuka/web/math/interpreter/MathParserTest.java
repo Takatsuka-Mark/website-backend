@@ -89,6 +89,15 @@ public class MathParserTest {
   }
 
   @Test
+  public void testTokenize_noSpace() {
+    List<String> expectedTokens = List.of("1", "+", "2");
+
+    List<String> fetchedTokens = mathParser.tokenize("1+2");
+
+    Truth.assertThat(fetchedTokens).containsExactlyElementsIn(expectedTokens);
+  }
+
+  @Test
   public void testLoadTokensIntoTables_simpleExpression() {
     List<String> testTokens = mathParser.tokenize(SIMPLE_EXPRESSION);
     Map<Integer, ExpressionEntry> expectedMap =

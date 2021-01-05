@@ -23,6 +23,7 @@ dependencies {
     implementation 'com.google.protobuf:protobuf-java:3.12.4'
     implementation 'com.google.protobuf:protobuf-java-util:3.12.4'
     implementation 'org.reflections:reflections:0.9.12'
+    implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:4.10.0'
     runtimeOnly 'org.springframework.boot:spring-boot-devtools:2.2.6.RELEASE'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.2.6.RELEASE'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
@@ -33,7 +34,7 @@ dependencies {
 }
 
 group = 'com.takatsuka'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 description = 'web'
 sourceCompatibility = '11'
 
