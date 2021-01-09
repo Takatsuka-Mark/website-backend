@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
 @Service
 public class MathService {
   private static final Logger logger = MathLogger.forCallingClass();
-  private static final int EXEC_TIME_LIMIT = 10; // Time in seconds to allow execution
+  private static final int EXEC_TIME_LIMIT = 5; // Time in seconds to allow execution
 
   private final MathParser mathParser;
   private final SimpleTimeLimiter simpleTimeLimiter;
@@ -39,9 +39,8 @@ public class MathService {
     String result = "";
     Stopwatch stopwatch = Stopwatch.createStarted();
     try {
-      simpleTimeLimiter.callWithTimeout(
+      result = simpleTimeLimiter.callWithTimeout(
           () -> new DoEval(expression).call(), EXEC_TIME_LIMIT, TimeUnit.SECONDS);
-      result = mathParser.evaluate(expression);
     } catch (TimeoutException e) {
       logger.error("The Executor timed out.");
       result = String.format("The execution time limit (%s seconds) was reached.", EXEC_TIME_LIMIT);
