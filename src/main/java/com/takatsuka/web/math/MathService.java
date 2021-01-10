@@ -14,6 +14,7 @@ import java.math.MathContext;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -23,25 +24,26 @@ public class MathService {
   private static final int EXEC_TIME_LIMIT = 2; // Time in seconds to allow execution
 
   private final MathParser mathParser;
-  private final SimpleTimeLimiter simpleTimeLimiter;
+  private final ExecutorService executorService;
 
   private int precision = 10;
 
   MathService(FunctionLoader functionLoader) {
     FunctionMapper functionMapper = new FunctionMapper(functionLoader.loadFunctions());
     this.mathParser = new MathParser(functionMapper);
-    ExecutorService executorService = Executors.newCachedThreadPool();
-    this.simpleTimeLimiter = SimpleTimeLimiter.create(executorService);
+    this.executorService = Executors.newCachedThreadPool();
   }
 
   public String evaluateExpression(String expression) {
     logger.info("Evaluating expression '{}'", expression);
     String result = "";
     Stopwatch stopwatch = Stopwatch.createStarted();
+
+    Future<String> future = executorService.submit(() -> mathParser.evaluate(expression));
     try {
-      result = simpleTimeLimiter.callWithTimeout(
-          () -> new DoEval(expression).call(), EXEC_TIME_LIMIT, TimeUnit.SECONDS);
+      result = future.get(EXEC_TIME_LIMIT, TimeUnit.SECONDS);
     } catch (TimeoutException e) {
+      future.cancel(true);
       logger.error("The Executor timed out.");
       result = String.format("The execution time limit (%s seconds) was reached.", EXEC_TIME_LIMIT);
     } catch (Exception e) {
