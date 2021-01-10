@@ -30,7 +30,7 @@ public class MathService {
   MathService(FunctionLoader functionLoader) {
     FunctionMapper functionMapper = new FunctionMapper(functionLoader.loadFunctions());
     this.mathParser = new MathParser(functionMapper);
-    ExecutorService executorService = Executors.newFixedThreadPool(5);
+    ExecutorService executorService = Executors.newCachedThreadPool();
     this.simpleTimeLimiter = SimpleTimeLimiter.create(executorService);
   }
 

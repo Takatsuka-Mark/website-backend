@@ -10,7 +10,7 @@ JARFILE=$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/a
 echo "Project ID: ${PROJECTID} Bucket: ${BUCKET}"
 
 # Get the files we need
-gsutil cp -r gs://"${BUCKET}"/"${JARFILE}" .
+gsutil cp -r gs://"${BUCKET}"/"${JARFILE}" ./website-backend-builds/
 
 # Install dependencies
 apt-get update
