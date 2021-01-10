@@ -25,7 +25,7 @@ public class MathController {
 
   // Refill one request every 6 seconds.
   private static final Bandwidth BUCKET_BANDWIDTH =
-      Bandwidth.classic(1, Refill.intervally(1L, Duration.ofSeconds(6L)));
+      Bandwidth.classic(1, Refill.intervally(1L, Duration.ofSeconds(3L)));
 
   public MathController(MathService mathService) {
     this.mathService = mathService;

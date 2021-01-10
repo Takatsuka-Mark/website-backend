@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
 @Service
 public class MathService {
   private static final Logger logger = MathLogger.forCallingClass();
-  private static final int EXEC_TIME_LIMIT = 5; // Time in seconds to allow execution
+  private static final int EXEC_TIME_LIMIT = 2; // Time in seconds to allow execution
 
   private final MathParser mathParser;
   private final SimpleTimeLimiter simpleTimeLimiter;
