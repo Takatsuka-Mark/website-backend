@@ -69,7 +69,12 @@ public class Evaluator {
       case MOD:
         return String.valueOf(new BigInteger(args.get(0)).mod(new BigInteger(args.get(1))));
       case POWER:
-        return String.valueOf(new BigInteger(args.get(0)).pow(Integer.parseInt(args.get(1))));
+        int exponent = Integer.parseInt(args.get(1));
+        int base = Integer.parseInt(args.get(0));
+        if(exponent > 1024) {
+          throw new RuntimeException("Exponent too large!");
+        }
+        return String.valueOf(new BigInteger(String.valueOf(base)).pow(exponent));
       case FACTORIAL:
         return String.valueOf(BigIntegerMath.factorial(Integer.parseInt(args.get(0))));
       case INT_DIVIDE:
