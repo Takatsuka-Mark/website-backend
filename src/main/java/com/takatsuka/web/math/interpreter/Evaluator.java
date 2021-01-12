@@ -74,7 +74,7 @@ public class Evaluator {
         if(exponent > 1024) {
           throw new RuntimeException("Exponent too large!");
         }
-        return String.valueOf(new BigInteger(String.valueOf(exponent)).pow(exponent));
+        return String.valueOf(new BigInteger(String.valueOf(base)).pow(exponent));
       case FACTORIAL:
         return String.valueOf(BigIntegerMath.factorial(Integer.parseInt(args.get(0))));
       case INT_DIVIDE:
