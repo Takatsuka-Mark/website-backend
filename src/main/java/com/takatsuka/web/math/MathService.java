@@ -2,13 +2,11 @@ package com.takatsuka.web.math;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
 import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.math.interpreter.FunctionMapper;
 import com.takatsuka.web.math.interpreter.MathParser;
 import com.takatsuka.web.math.interpreter.FunctionLoader;
-import io.github.resilience4j.timelimiter.TimeLimiter;
-import io.github.resilience4j.timelimiter.TimeLimiterConfig;
-import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
@@ -16,22 +14,18 @@ import org.springframework.stereotype.Service;
 import java.math.MathContext;
 import java.time.Duration;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Service
 public class MathService {
   private static final Logger logger = MathLogger.forCallingClass();
-  private static final int EXEC_TIME_LIMIT = 2; // Time in seconds to allow execution
-  private static final TimeLimiterConfig TIME_LIMITER_CONFIG = generateTimeLimiterConfig();
+  private static final Duration EXEC_TIME_LIMIT = Duration.ofSeconds(2); // Time in seconds to allow execution
 
   private final MathParser mathParser;
   private final ExecutorService executorService;
-  private final TimeLimiterRegistry timeLimiterRegistry;
+  private final TimeLimiter timeLimiter;
 
   private int precision = 10;
 
@@ -39,18 +33,17 @@ public class MathService {
     FunctionMapper functionMapper = new FunctionMapper(functionLoader.loadFunctions());
     this.mathParser = new MathParser(functionMapper);
     this.executorService = Executors.newCachedThreadPool();
-    this.timeLimiterRegistry = TimeLimiterRegistry.of(TIME_LIMITER_CONFIG);
+    this.timeLimiter = SimpleTimeLimiter.create(executorService);
   }
 
   public String evaluateExpression(String expression) {
     logger.info("Evaluating expression '{}'", expression);
     String result = "";
     Stopwatch stopwatch = Stopwatch.createStarted();
-    TimeLimiter timeLimiter = timeLimiterRegistry.timeLimiter("testTimeLimiter");
 
     try {
-      result = timeLimiter.executeFutureSupplier(
-          () -> CompletableFuture.supplyAsync(() -> mathParser.evaluate(expression)));
+      DoEval doEval = new DoEval(expression);
+      result = timeLimiter.callWithTimeout(doEval, EXEC_TIME_LIMIT);
     } catch (TimeoutException e) {
       logger.error("The Executor timed out.");
       result = String.format("The execution time limit (%s seconds) was reached.", EXEC_TIME_LIMIT);
@@ -68,23 +61,20 @@ public class MathService {
     return result;
   }
 
-  public void setPrecision(int newPrecision) {
-    precision = newPrecision;
-  }
+  private class DoEval implements Callable<String> {
+    private final String expression;
 
-  public int getPrecision() {
-    return precision;
+    public DoEval(String expression) {
+      this.expression = expression;
+    }
+
+    public String call() {
+      return mathParser.evaluate(expression);
+    }
   }
 
   @Bean
   public MathContext generateMathContext() {
     return new MathContext(precision);
-  }
-
-  private static TimeLimiterConfig generateTimeLimiterConfig() {
-    return TimeLimiterConfig.custom()
-        .cancelRunningFuture(/* cancelRunningFuture=*/ true)
-        .timeoutDuration(Duration.ofSeconds(EXEC_TIME_LIMIT))
-        .build();
   }
 }
