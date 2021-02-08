@@ -56,29 +56,6 @@ public class BasicEvaluator {
     return lcmThroughGcd(input).toString();
   }
 
-  public String pow(BigInteger base, BigInteger exp) {
-    boolean isNegative = false;
-    // DO MATH
-    if (exp.signum() < 0) {
-      isNegative = true;
-      exp = exp.abs();
-    }
-
-    BigInteger result = BigInteger.ONE;
-
-    while (exp.signum() > 0) {
-      throwIfInterrupted(); // Catch for interrupted thread.
-
-      if (exp.mod(BigInteger.TWO).equals(BigInteger.ONE)) {
-        result = result.multiply(base);
-      }
-      base = base.multiply(base);
-      exp = exp.shiftLeft(1);
-    }
-
-    return result.toString();
-  }
-
   private BigInteger gcdEuclidean(List<BigInteger> input) {
     BigInteger result = input.get(0);
     for (int i = 1; i < input.size(); i++) {
@@ -105,12 +82,5 @@ public class BasicEvaluator {
     }
 
     return result;
-  }
-
-  private void throwIfInterrupted() {
-    if (Thread.currentThread().isInterrupted()) {
-      logger.error("Timeout in BasicEvaluator.");
-      throw new RuntimeException("Timeout in BasicEvaluator", new TimeoutException());
-    }
   }
 }
