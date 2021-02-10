@@ -1,6 +1,8 @@
 package com.takatsuka.web.math.evaluators;
 
+import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.math.interpreter.Evaluator;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -9,9 +11,11 @@ import java.math.MathContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 public class BasicEvaluator {
 
+  private static final Logger logger = MathLogger.forCallingClass();
   private final MathContext mathContext;
 
   public BasicEvaluator(MathContext mathContext) {
@@ -48,6 +52,10 @@ public class BasicEvaluator {
     return gcdEuclidean(input).toString();
   }
 
+  public String lcm(List<BigInteger> input) {
+    return lcmThroughGcd(input).toString();
+  }
+
   private BigInteger gcdEuclidean(List<BigInteger> input) {
     BigInteger result = input.get(0);
     for (int i = 1; i < input.size(); i++) {
@@ -65,10 +73,6 @@ public class BasicEvaluator {
     }
 
     return gcdEuclidean(B, A.mod(B));
-  }
-
-  public String lcm(List<BigInteger> input) {
-    return lcmThroughGcd(input).toString();
   }
 
   private BigInteger lcmThroughGcd(List<BigInteger> input) {

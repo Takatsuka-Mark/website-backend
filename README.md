@@ -21,5 +21,5 @@ Check out my website at [markTakatsuka.com](https://markTakatsuka.com)
 ```shell
 gradle clean build
 
-gsutil cp build/libs/* gs://website-backend-builds/build[version].jar
+gsutil cp build/libs/* gs://website-backend-builds/[version].jar
 ```
