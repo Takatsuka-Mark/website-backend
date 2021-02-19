@@ -7,6 +7,7 @@ import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.math.interpreter.FunctionMapper;
 import com.takatsuka.web.math.interpreter.MathParser;
 import com.takatsuka.web.math.interpreter.FunctionLoader;
+import com.takatsuka.web.utils.exceptions.MathExecException;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.math.MathContext;
 import java.time.Duration;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
@@ -44,14 +46,23 @@ public class MathService {
     try {
       DoEval doEval = new DoEval(expression);
       result = timeLimiter.callWithTimeout(doEval, EXEC_TIME_LIMIT);
-    } catch (TimeoutException e) {
+    } catch(MathExecException execException){
+      logger.error(execException.toString());
+      result = execException.toString();
+    } catch (TimeoutException | InterruptedException | ExecutionException e) {
       logger.error("The Executor timed out.");
       result = String.format("The execution time limit (%s seconds) was reached.", EXEC_TIME_LIMIT);
-    } catch (Exception e) {
-      logger.error("An error was caught by the catch-all: ", e);
-      result =
-          "There was an error evaluating your expression. "
-              + "Check your syntax! A live syntax checker is coming soon.";
+    }
+    catch (Exception e) {
+      if(e.getCause() instanceof MathExecException){
+        logger.error(e.getCause().toString());
+        result = e.getCause().toString();
+      } else {
+        logger.error("An error was caught by the catch-all: ", e);
+        result =
+            "There was an error evaluating your expression. "
+                + "Check your syntax! A live syntax checker is coming soon.";
+      }
     }
     logger.info(
         "Expression '{}' evaluated to '{}' in '{}' millis",
