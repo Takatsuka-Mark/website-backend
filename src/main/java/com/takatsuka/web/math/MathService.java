@@ -30,8 +30,6 @@ public class MathService {
   private final MathParser mathParser;
   private final TimeLimiter timeLimiter;
 
-  private int precision = 10;
-
   MathService(FunctionLoader functionLoader) {
     FunctionMapper functionMapper = new FunctionMapper(functionLoader.loadFunctions());
     this.mathParser = new MathParser(functionMapper);
@@ -39,7 +37,7 @@ public class MathService {
     this.timeLimiter = SimpleTimeLimiter.create(executorService);
   }
 
-  public String evaluateExpression(String expression) {
+  public String evaluateExpression(String expression, MathSettings mathSettings) {
     logger.info("Evaluating expression '{}'", expression);
     String result = "";
     Stopwatch stopwatch = Stopwatch.createStarted();
@@ -90,10 +88,5 @@ public class MathService {
     public String call() {
       return mathParser.evaluate(expression);
     }
-  }
-
-  @Bean
-  public MathContext generateMathContext() {
-    return new MathContext(precision);
   }
 }

@@ -38,9 +38,10 @@ public class MathController {
       @RequestParam(name = "dispPrecision", defaultValue = "10") int displayPrecision,
       HttpServletRequest request) {
     Bucket bucket = getBucketOrCreate(request.getRemoteAddr());
+    MathSettings mathSettings = new MathSettings(displayPrecision, computationPrecision);
 
     if (bucket.tryConsume(1L)) {
-      return mathService.evaluateExpression(expression);
+      return mathService.evaluateExpression(expression, mathSettings);
     } else {
       return REQUEST_OVERLOAD_MSG;
     }

@@ -1,10 +1,7 @@
 package com.takatsuka.web.math.evaluators;
 
-import org.springframework.stereotype.Component;
-
 import java.math.MathContext;
 
-@Component
 public class TrigEvaluator {
 
   private final MathContext mathContext;
