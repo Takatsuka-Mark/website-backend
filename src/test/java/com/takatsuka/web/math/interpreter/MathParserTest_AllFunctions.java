@@ -14,8 +14,7 @@ public class MathParserTest_AllFunctions {
 
   @Before
   public void init() {
-    FunctionLoader functionLoader = new FunctionLoader(new FileUtils());
-    FunctionMapper functionMapper = new FunctionMapper(functionLoader.loadFunctions());
+    FunctionMapper functionMapper = new FunctionMapper(FileUtils.loadFunctionsFromFiles());
     mathParser = new MathParser(functionMapper);
   }
 

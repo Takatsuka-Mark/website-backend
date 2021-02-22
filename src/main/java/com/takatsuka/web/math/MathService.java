@@ -6,7 +6,7 @@ import com.google.common.util.concurrent.TimeLimiter;
 import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.math.interpreter.FunctionMapper;
 import com.takatsuka.web.math.interpreter.MathParser;
-import com.takatsuka.web.math.interpreter.FunctionLoader;
+import com.takatsuka.web.utils.FileUtils;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
@@ -29,8 +29,8 @@ public class MathService {
 
   private int precision = 10;
 
-  MathService(FunctionLoader functionLoader) {
-    FunctionMapper functionMapper = new FunctionMapper(functionLoader.loadFunctions());
+  MathService() {
+    FunctionMapper functionMapper = new FunctionMapper(FileUtils.loadFunctionsFromFiles());
     this.mathParser = new MathParser(functionMapper);
     this.executorService = Executors.newCachedThreadPool();
     this.timeLimiter = SimpleTimeLimiter.create(executorService);

@@ -2,18 +2,12 @@ package com.takatsuka.web.math.interpreter;
 
 import com.google.common.truth.Truth;
 import com.google.common.truth.extensions.proto.ProtoTruth;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.util.JsonFormat;
 import com.takatsuka.web.interpreter.ExpressionEntry;
 import com.takatsuka.web.interpreter.Function;
-import com.takatsuka.web.interpreter.FunctionDefinition;
-import com.takatsuka.web.interpreter.MathMethod;
-import com.takatsuka.web.interpreter.ParamType;
 import com.takatsuka.web.utils.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.beans.Expression;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +21,7 @@ public class MathParserTest {
 
   @Before
   public void init() {
-    FunctionLoader functionLoader = new FunctionLoader(new FileUtils());
-    FunctionMapper functionMapper = new FunctionMapper(functionLoader.loadFunctions());
+    FunctionMapper functionMapper = new FunctionMapper(FileUtils.loadFunctionsFromFiles());
     mathParser =
         new MathParser(
             functionMapper);
