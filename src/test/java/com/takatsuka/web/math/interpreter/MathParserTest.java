@@ -24,7 +24,7 @@ public class MathParserTest {
     FunctionMapper functionMapper = new FunctionMapper(FileUtils.loadFunctionsFromFiles());
     mathParser =
         new MathParser(
-            functionMapper);
+            functionMapper, new Evaluator(functionMapper));
   }
 
   @Test

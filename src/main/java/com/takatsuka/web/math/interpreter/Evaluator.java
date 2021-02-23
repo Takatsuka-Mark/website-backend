@@ -9,6 +9,8 @@ import com.takatsuka.web.math.evaluators.ExponentialEvaluator;
 import com.takatsuka.web.math.evaluators.RandomEvaluator;
 import com.takatsuka.web.math.evaluators.TrigEvaluator;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
+@Component
 public class Evaluator {
   private static final Logger logger = MathLogger.forCallingClass();
 
@@ -33,11 +36,7 @@ public class Evaluator {
   private final FunctionMapper functionMapper;
 
   public Evaluator(FunctionMapper functionMapper) {
-    this(100, functionMapper);
-  }
-
-  public Evaluator(int precision, FunctionMapper functionMapper) {
-    mathContext = new MathContext(precision);
+    mathContext = new MathContext(100);
     basicEvaluator = new BasicEvaluator(mathContext);
     randomEvaluator = new RandomEvaluator(mathContext);
     exponentialEvaluator = new ExponentialEvaluator(mathContext);

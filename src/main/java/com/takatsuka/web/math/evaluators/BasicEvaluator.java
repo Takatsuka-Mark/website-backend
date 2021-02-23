@@ -8,11 +8,10 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 
+@Component
 public class BasicEvaluator {
 
   private static final Logger logger = MathLogger.forCallingClass();

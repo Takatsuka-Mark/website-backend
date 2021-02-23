@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Random;
 
+@Component
 public class RandomEvaluator {
 
   private final MathContext mathContext;

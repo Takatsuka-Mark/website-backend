@@ -3,11 +3,13 @@ package com.takatsuka.web.math.evaluators;
 import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.utils.ThreadUtils;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
+@Component
 public class ExponentialEvaluator {
 
   private static final Logger logger = MathLogger.forCallingClass();

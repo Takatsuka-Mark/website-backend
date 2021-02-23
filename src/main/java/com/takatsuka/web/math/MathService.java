@@ -29,9 +29,8 @@ public class MathService {
 
   private int precision = 10;
 
-  MathService() {
-    FunctionMapper functionMapper = new FunctionMapper(FileUtils.loadFunctionsFromFiles());
-    this.mathParser = new MathParser(functionMapper);
+  MathService(MathParser mathParser) {
+    this.mathParser = mathParser;
     this.executorService = Executors.newCachedThreadPool();
     this.timeLimiter = SimpleTimeLimiter.create(executorService);
   }
@@ -76,5 +75,10 @@ public class MathService {
   @Bean
   public MathContext generateMathContext() {
     return new MathContext(precision);
+  }
+
+  @Bean
+  public FunctionMapper generateFunctionMapper() {
+    return new FunctionMapper(FileUtils.loadFunctionsFromFiles());
   }
 }

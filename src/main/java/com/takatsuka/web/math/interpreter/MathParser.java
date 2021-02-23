@@ -5,6 +5,7 @@ import com.takatsuka.web.interpreter.ExpressionEntry;
 import com.takatsuka.web.interpreter.Function;
 import com.takatsuka.web.logging.MathLogger;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Component
 public class MathParser {
   private static final Logger logger = MathLogger.forCallingClass();
 
@@ -27,10 +29,10 @@ public class MathParser {
   private final Evaluator evaluator;
   private final FunctionMapper functionMapper;
 
-  public MathParser(FunctionMapper functionMapper) {
+  public MathParser(FunctionMapper functionMapper, Evaluator evaluator) {
     this.functionMapper = functionMapper;
     regex = functionMapper.getPattern();
-    evaluator = new Evaluator(functionMapper);
+    this.evaluator = evaluator;
   }
 
   public String evaluate(String expression) {
@@ -365,11 +367,4 @@ public class MathParser {
 
     return builder;
   }
-
-//  private String padNumbers(String expression) {
-//    boolean prevIsNum = false;
-//    for (String tok: expression.split("")) {
-//        if()
-//    }
-//  }
 }
