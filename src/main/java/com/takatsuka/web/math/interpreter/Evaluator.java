@@ -77,7 +77,7 @@ public class Evaluator {
       case MOD:
         return String.valueOf(new BigInteger(args.get(0)).mod(new BigInteger(args.get(1))));
       case POWER:
-        return exponentialEvaluator.pow(new BigInteger(args.get(0)), new BigInteger(args.get(1)));
+        return exponentialEvaluator.pow(new BigDecimal(args.get(0)), new BigInteger(args.get(1)));
       case FACTORIAL:
         return String.valueOf(BigIntegerMath.factorial(Integer.parseInt(args.get(0))));
       case INT_DIVIDE:

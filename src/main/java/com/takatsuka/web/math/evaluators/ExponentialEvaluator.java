@@ -30,18 +30,19 @@ public class ExponentialEvaluator {
     return "Needs implementation.";
   }
 
-  public String pow(BigInteger base, BigInteger exp) {
+  public String pow(BigDecimal base, BigInteger exp) {
     return modPowHelper(base, exp, null, true);
   }
 
-  public String modPow(BigInteger base, BigInteger exp, BigInteger mod) {
+  public String modPow(BigDecimal base, BigInteger exp, BigInteger mod) {
     if(mod.signum() > 0) {
       return modPowHelper(base, exp, mod, false);
     }
     return "0"; // TODO(mark): notify that the sign of the mod was incorrect.
   }
 
-  private String modPowHelper(BigInteger base, BigInteger exp, BigInteger mod, boolean ignoreMod) {
+  // TODO(mark): Could use an optional on the mod.
+  private String modPowHelper(BigDecimal base, BigInteger exp, BigInteger mod, boolean ignoreMod) {
     boolean isNegative = false;
     // DO MATH
     if (exp.signum() < 0) {
@@ -49,7 +50,11 @@ public class ExponentialEvaluator {
       exp = exp.abs();
     }
 
-    BigInteger accumulator = BigInteger.ONE;
+    BigDecimal accumulator = BigDecimal.ONE;
+    BigDecimal decimal_mod = BigDecimal.ZERO; // Temporary
+    if (!ignoreMod) {
+      decimal_mod = new BigDecimal(mod);
+    }
 
     while (exp.signum() > 0) {
       ThreadUtils.throwIfInterrupted(logger); // Catch for interrupted thread.
@@ -61,15 +66,15 @@ public class ExponentialEvaluator {
       exp = exp.shiftRight(1);
 
       if(!ignoreMod) {
-        accumulator = accumulator.mod(mod);
-        base = base.mod(mod);
+        accumulator = accumulator.remainder(decimal_mod);
+        base = base.remainder(decimal_mod);
       }
     }
 
     String result = accumulator.toString();
 
     if(isNegative) {
-      result = BigDecimal.ONE.divide(new BigDecimal(accumulator), mathContext).toString();
+      result = BigDecimal.ONE.divide(accumulator, mathContext).toString();
     }
 
     return result;
