@@ -2,11 +2,13 @@ package com.takatsuka.web.math.evaluators;
 
 import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.utils.ThreadUtils;
+import com.takatsuka.web.utils.exceptions.MathExecException;
 import org.slf4j.Logger;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.Optional;
 
 public class ExponentialEvaluator {
 
@@ -18,7 +20,7 @@ public class ExponentialEvaluator {
     this.mathContext = mathContext;
   }
 
-  public String lg(BigDecimal input){
+  public String lg(BigDecimal input) {
     return logn(TWO, input);
   }
 
@@ -27,22 +29,25 @@ public class ExponentialEvaluator {
   }
 
   public String logn(BigDecimal base, BigDecimal value) {
-    return "Needs implementation.";
+    throw new MathExecException(
+        "logn", null, MathExecException.MathExecExceptionType.FUNCTION_IN_TESTING);
   }
 
   public String pow(BigDecimal base, BigInteger exp) {
-    return modPowHelper(base, exp, null, true);
+    return modPowHelper(base, exp, Optional.empty());
   }
 
   public String modPow(BigDecimal base, BigInteger exp, BigInteger mod) {
-    if(mod.signum() > 0) {
-      return modPowHelper(base, exp, mod, false);
+    if (mod.signum() > 0) {
+      return modPowHelper(base, exp, Optional.of(mod));
     }
-    return "0"; // TODO(mark): notify that the sign of the mod was incorrect.
+    throw new MathExecException(
+        "modulus of modPow", null, MathExecException.MathExecExceptionType.POSITIVE_REQUIRED);
   }
 
   // TODO(mark): Could use an optional on the mod.
-  private String modPowHelper(BigDecimal base, BigInteger exp, BigInteger mod, boolean ignoreMod) {
+  private String modPowHelper(BigDecimal base, BigInteger exp, Optional<BigInteger> optionalMod) {
+    boolean ignoreMod = optionalMod.isEmpty();
     boolean isNegative = false;
     // DO MATH
     if (exp.signum() < 0) {
@@ -53,7 +58,7 @@ public class ExponentialEvaluator {
     BigDecimal accumulator = BigDecimal.ONE;
     BigDecimal decimal_mod = BigDecimal.ZERO; // Temporary
     if (!ignoreMod) {
-      decimal_mod = new BigDecimal(mod);
+      decimal_mod = new BigDecimal(optionalMod.get());
     }
 
     while (exp.signum() > 0) {
@@ -65,7 +70,7 @@ public class ExponentialEvaluator {
       base = base.multiply(base);
       exp = exp.shiftRight(1);
 
-      if(!ignoreMod) {
+      if (!ignoreMod) {
         accumulator = accumulator.remainder(decimal_mod);
         base = base.remainder(decimal_mod);
       }
@@ -73,7 +78,7 @@ public class ExponentialEvaluator {
 
     String result = accumulator.toString();
 
-    if(isNegative) {
+    if (isNegative) {
       result = BigDecimal.ONE.divide(accumulator, mathContext).toString();
     }
 

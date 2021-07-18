@@ -3,6 +3,7 @@ package com.takatsuka.web.math;
 import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.TimeLimiter;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.math.interpreter.FunctionMapper;
 import com.takatsuka.web.math.interpreter.MathParser;
@@ -50,7 +51,14 @@ public class MathService {
     } catch(MathException exception){
       logger.error(exception.toString());
       result = exception.toString();
-    } catch (TimeoutException | InterruptedException | ExecutionException e) {
+    } catch(UncheckedExecutionException exception) {
+      // TODO: Figure out why this exection is being thrown.
+      //  This is a terrible way to check
+      if(exception.getCause() instanceof MathException){
+        logger.error("Unchecked Exception: " + exception.getCause());
+        result = exception.getCause().toString();
+      }
+    } catch(TimeoutException | InterruptedException | ExecutionException e) {
       logger.error("The Executor timed out.");
       result = String.format("The execution time limit (%s seconds) was reached.", EXEC_TIME_LIMIT);
     }

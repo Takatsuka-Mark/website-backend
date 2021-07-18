@@ -70,7 +70,7 @@ public class Evaluator {
         if (param2.equals(BigDecimal.ZERO)) {
           throw new MathExecException(
               String.format("%s / %s", param1.toString(), param2.toString()),
-              0,
+              null,
               MathExecException.MathExecExceptionType.DIV_BY_ZERO);
         }
         return String.valueOf(param1.divide(param2, mathContext));

@@ -2,10 +2,10 @@ package com.takatsuka.web.utils.exceptions;
 
 public class MathExecException extends MathException{
   private final String cause;
-  private final int location;
+  private final String location;
   private final MathExecExceptionType mathExecExceptionType;
 
-  public MathExecException(String cause, int location, MathExecExceptionType mathExecExceptionType) {
+  public MathExecException(String cause, String location, MathExecExceptionType mathExecExceptionType) {
     this.cause = cause;
     this.location = location;
     this.mathExecExceptionType = mathExecExceptionType;
@@ -18,6 +18,13 @@ public class MathExecException extends MathException{
       case DIV_BY_ZERO:
         typeMessage = "Cannot divide by zero.";
         break;
+      case FUNCTION_IN_TESTING:
+        typeMessage =
+                String.format("Function '%s' is in testing and not available right now.", cause);
+        break;
+      case POSITIVE_REQUIRED:
+        typeMessage =
+                String.format("A positive value is required in the %s.", cause);
       default:
         typeMessage = "Unknown Execution Failure.";
         break;
@@ -28,5 +35,7 @@ public class MathExecException extends MathException{
 
   public enum MathExecExceptionType {
     DIV_BY_ZERO,
+    FUNCTION_IN_TESTING,
+    POSITIVE_REQUIRED
   }
 }
