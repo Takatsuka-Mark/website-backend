@@ -3,10 +3,13 @@ package com.takatsuka.web.math;
 import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.TimeLimiter;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.math.interpreter.FunctionMapper;
 import com.takatsuka.web.math.interpreter.MathParser;
 import com.takatsuka.web.math.interpreter.FunctionLoader;
+import com.takatsuka.web.utils.exceptions.MathException;
+import com.takatsuka.web.utils.exceptions.MathExecException;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.math.MathContext;
 import java.time.Duration;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
@@ -24,7 +28,6 @@ public class MathService {
   private static final Duration EXEC_TIME_LIMIT = Duration.ofSeconds(5); // Time in seconds to allow execution
 
   private final MathParser mathParser;
-  private final ExecutorService executorService;
   private final TimeLimiter timeLimiter;
 
   private int precision = 10;
@@ -32,7 +35,7 @@ public class MathService {
   MathService(FunctionLoader functionLoader) {
     FunctionMapper functionMapper = new FunctionMapper(functionLoader.loadFunctions());
     this.mathParser = new MathParser(functionMapper);
-    this.executorService = Executors.newCachedThreadPool();
+    ExecutorService executorService = Executors.newCachedThreadPool();
     this.timeLimiter = SimpleTimeLimiter.create(executorService);
   }
 
@@ -44,14 +47,30 @@ public class MathService {
     try {
       DoEval doEval = new DoEval(expression);
       result = timeLimiter.callWithTimeout(doEval, EXEC_TIME_LIMIT);
-    } catch (TimeoutException e) {
+    } catch(MathException exception){
+      logger.error(exception.toString());
+      result = exception.toString();
+    } catch(UncheckedExecutionException exception) {
+      // TODO: Figure out why this exection is being thrown.
+      //  This is a terrible way to check
+      if(exception.getCause() instanceof MathException){
+        logger.error("Unchecked Exception: " + exception.getCause());
+        result = exception.getCause().toString();
+      }
+    } catch(TimeoutException | InterruptedException | ExecutionException e) {
       logger.error("The Executor timed out.");
       result = String.format("The execution time limit (%s seconds) was reached.", EXEC_TIME_LIMIT);
-    } catch (Exception e) {
-      logger.error("An error was caught by the catch-all: ", e);
-      result =
-          "There was an error evaluating your expression. "
-              + "Check your syntax! A live syntax checker is coming soon.";
+    }
+    catch (Exception e) {
+      if(e.getCause() instanceof MathExecException){
+        logger.error(e.getCause().toString());
+        result = e.getCause().toString();
+      } else {
+        logger.error("An error was caught by the catch-all: ", e);
+        result =
+            "There was an error evaluating your expression. "
+                + "Check your syntax! A live syntax checker is coming soon.";
+      }
     }
     logger.info(
         "Expression '{}' evaluated to '{}' in '{}' millis",

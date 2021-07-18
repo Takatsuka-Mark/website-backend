@@ -8,6 +8,7 @@ import com.takatsuka.web.math.evaluators.BasicEvaluator;
 import com.takatsuka.web.math.evaluators.ExponentialEvaluator;
 import com.takatsuka.web.math.evaluators.RandomEvaluator;
 import com.takatsuka.web.math.evaluators.TrigEvaluator;
+import com.takatsuka.web.utils.exceptions.MathExecException;
 import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
@@ -18,7 +19,6 @@ import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 public class Evaluator {
   private static final Logger logger = MathLogger.forCallingClass();
@@ -65,12 +65,19 @@ public class Evaluator {
         return String.valueOf(
             new BigDecimal(args.get(0)).multiply(new BigDecimal(args.get(1)), mathContext));
       case DIVIDE:
-        return String.valueOf(
-            new BigDecimal(args.get(0)).divide(new BigDecimal(args.get(1)), mathContext));
+        BigDecimal param1 = new BigDecimal(args.get(0));
+        BigDecimal param2 = new BigDecimal(args.get(1));
+        if (param2.equals(BigDecimal.ZERO)) {
+          throw new MathExecException(
+              String.format("%s / %s", param1.toString(), param2.toString()),
+              null,
+              MathExecException.MathExecExceptionType.DIV_BY_ZERO);
+        }
+        return String.valueOf(param1.divide(param2, mathContext));
       case MOD:
         return String.valueOf(new BigInteger(args.get(0)).mod(new BigInteger(args.get(1))));
       case POWER:
-        return exponentialEvaluator.pow(new BigInteger(args.get(0)), new BigInteger(args.get(1)));
+        return exponentialEvaluator.pow(new BigDecimal(args.get(0)), new BigInteger(args.get(1)));
       case FACTORIAL:
         return String.valueOf(BigIntegerMath.factorial(Integer.parseInt(args.get(0))));
       case INT_DIVIDE:

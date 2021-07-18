@@ -168,15 +168,12 @@ public class MathParser {
         int idx = Collections.max(expressionTable.keySet());
         ExpressionEntry.Builder entryToUpdate = expressionTable.get(idx).toBuilder();
 
-        if (functionMapper.getMaxArgs(entryToUpdate.getFunction()) == Integer.MAX_VALUE) {
-          // The position is just "the next"
-          entryToUpdate.addArgs(argBackup.remove()); // Get the previous arg
-        } else {
+        if (functionMapper.getMaxArgs(entryToUpdate.getFunction()) != Integer.MAX_VALUE) {
           for (int j = entryToUpdate.getArgsCount(); j < entryToUpdate.getMaxArg() - 1; j++) {
             entryToUpdate.addArgs("0"); // Placeholder
           }
-          entryToUpdate.addArgs(argBackup.remove());
         }
+        entryToUpdate.addArgs(argBackup.remove()); // Get the previous arg
 
         expressionTable.replace(idx, entryToUpdate.build());
       } else {

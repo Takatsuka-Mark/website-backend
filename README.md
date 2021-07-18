@@ -23,3 +23,11 @@ gradle clean build
 
 gsutil cp build/libs/* gs://website-backend-builds/[version].jar
 ```
+
+## Updating Certs
+```shell
+sudo certbot renew
+
+cd /etc/letsencrypt/live/[cert_name]
+openssl pkcs12 -export -in fullchain.pem -inkey privkey.pem -out keystore.p12 -name backend -CAfile chain.pem -caname root
+```

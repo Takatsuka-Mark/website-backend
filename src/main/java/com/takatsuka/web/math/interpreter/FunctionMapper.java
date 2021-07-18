@@ -3,7 +3,7 @@ package com.takatsuka.web.math.interpreter;
 import com.takatsuka.web.interpreter.Function;
 import com.takatsuka.web.interpreter.FunctionDefinition;
 import com.takatsuka.web.interpreter.ParamType;
-import org.springframework.stereotype.Component;
+import com.takatsuka.web.utils.exceptions.MathParseException;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 public class FunctionMapper {
   private static final String SYMBOL_GROUPS = "([+\\-*/%^!()])";
   private static final String NUM_REGEX = "(-?\\d+([.]\\d+)?)";
+  private static final String FUNC_REGEX = "(\\w+)";
 
   private final Map<String, Function> multiVariableFunctionMap;
   private final Map<String, Function> symbolOperatorMap;
@@ -34,22 +35,20 @@ public class FunctionMapper {
     functionToMethodMap = new HashMap<>();
     functionToParamTypeMap = new HashMap<>();
     ArrayList<String> patterns = new ArrayList<>();
-    patterns.add("//");   // Add integer division as so it is not parsed as two '/'
+    patterns.add("//"); // Add integer division as so it is not parsed as two '/'
     patterns.add(NUM_REGEX);
     patterns.add(SYMBOL_GROUPS);
+    patterns.add(FUNC_REGEX);
     patterns.add(",");
 
     // Build multi-variable functions
     for (FunctionDefinition functionDefinition : functionsList) {
       // Map the symbol to the function
       multiVariableFunctionMap.put(
-          functionDefinition.getSymbol(), functionDefinition.getFunction());
+          functionDefinition.getSymbol().toLowerCase(), functionDefinition.getFunction());
 
       // Map the function to max-args.
       functionToMaxArgMap.put(functionDefinition.getFunction(), functionDefinition.getMaxArgs());
-
-      // Add pattern
-      patterns.add(functionDefinition.getPattern());
 
       // Add function value
       functionToMethodMap.put(functionDefinition.getFunction(), getMethod(functionDefinition));
@@ -88,13 +87,14 @@ public class FunctionMapper {
   }
 
   public Function mapStringToFunction(String token) {
+    token = token.toLowerCase();
     if (multiVariableFunctionMap.containsKey(token)) {
       return multiVariableFunctionMap.get(token);
     }
     if (symbolOperatorMap.containsKey(token)) {
       return symbolOperatorMap.get(token);
     }
-    return null;
+    throw new MathParseException(token, null, MathParseException.ParseExceptionType.FUNCTION_NOT_DEFINED);
   }
 
   public int getMaxArgs(Function function) {
