@@ -32,4 +32,9 @@ public class RandomEvaluatorTest {
     Truth.assertThat(result).isAtLeast(min);
     Truth.assertThat(result).isLessThan(max);
   }
+
+  @Test
+  public void testFake() {
+    Truth.assertThat(1).isEqualTo(0);
+  }
 }
