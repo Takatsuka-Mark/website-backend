@@ -20,4 +20,5 @@ apt-get -y --force-yes install openjdk-11-jdk
 update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/jre/bin/java
 
 # Start server
+export spring_profiles_active=prod
 java -jar /website-backend-builds/"${JARFILE}"

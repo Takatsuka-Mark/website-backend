@@ -1,6 +1,6 @@
 package com.takatsuka.web.utils.exceptions;
 
-public class MathParseException extends RuntimeException implements MathException{
+public class MathParseException extends MathException{
   private final String cause;
   private final int location;
   private final ParseExceptionType parseExceptionType;
@@ -25,7 +25,6 @@ public class MathParseException extends RuntimeException implements MathExceptio
         typeMessage = "Unknown.";
         break;
     }
-
 
     return String.format("MathParseException: Caused by: '%s' At: '%d'. %s", cause, location, typeMessage);
   }

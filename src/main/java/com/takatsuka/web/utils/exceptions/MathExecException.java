@@ -1,6 +1,6 @@
 package com.takatsuka.web.utils.exceptions;
 
-public class MathExecException extends RuntimeException implements MathException{
+public class MathExecException extends MathException{
   private final String cause;
   private final int location;
   private final MathExecExceptionType mathExecExceptionType;
@@ -23,7 +23,7 @@ public class MathExecException extends RuntimeException implements MathException
         break;
     }
 
-    return "MathExecException: " + typeMessage;
+    return typeMessage;
   }
 
   public enum MathExecExceptionType {

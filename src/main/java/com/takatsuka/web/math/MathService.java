@@ -7,6 +7,7 @@ import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.math.interpreter.FunctionMapper;
 import com.takatsuka.web.math.interpreter.MathParser;
 import com.takatsuka.web.math.interpreter.FunctionLoader;
+import com.takatsuka.web.utils.exceptions.MathException;
 import com.takatsuka.web.utils.exceptions.MathExecException;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
@@ -46,9 +47,9 @@ public class MathService {
     try {
       DoEval doEval = new DoEval(expression);
       result = timeLimiter.callWithTimeout(doEval, EXEC_TIME_LIMIT);
-    } catch(MathExecException execException){
-      logger.error(execException.toString());
-      result = execException.toString();
+    } catch(MathException exception){
+      logger.error(exception.toString());
+      result = exception.toString();
     } catch (TimeoutException | InterruptedException | ExecutionException e) {
       logger.error("The Executor timed out.");
       result = String.format("The execution time limit (%s seconds) was reached.", EXEC_TIME_LIMIT);
