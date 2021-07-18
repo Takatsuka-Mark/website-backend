@@ -28,7 +28,6 @@ public class MathService {
   private static final Duration EXEC_TIME_LIMIT = Duration.ofSeconds(5); // Time in seconds to allow execution
 
   private final MathParser mathParser;
-  private final ExecutorService executorService;
   private final TimeLimiter timeLimiter;
 
   private int precision = 10;
@@ -36,7 +35,7 @@ public class MathService {
   MathService(FunctionLoader functionLoader) {
     FunctionMapper functionMapper = new FunctionMapper(functionLoader.loadFunctions());
     this.mathParser = new MathParser(functionMapper);
-    this.executorService = Executors.newCachedThreadPool();
+    ExecutorService executorService = Executors.newCachedThreadPool();
     this.timeLimiter = SimpleTimeLimiter.create(executorService);
   }
 
