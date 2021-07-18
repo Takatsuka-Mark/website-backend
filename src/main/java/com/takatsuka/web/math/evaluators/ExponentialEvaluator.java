@@ -45,7 +45,6 @@ public class ExponentialEvaluator {
         "modulus of modPow", null, MathExecException.MathExecExceptionType.POSITIVE_REQUIRED);
   }
 
-  // TODO(mark): Could use an optional on the mod.
   private String modPowHelper(BigDecimal base, BigInteger exp, Optional<BigInteger> optionalMod) {
     boolean ignoreMod = optionalMod.isEmpty();
     boolean isNegative = false;
