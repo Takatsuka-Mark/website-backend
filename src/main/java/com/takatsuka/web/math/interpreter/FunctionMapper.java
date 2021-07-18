@@ -50,9 +50,6 @@ public class FunctionMapper {
       // Map the function to max-args.
       functionToMaxArgMap.put(functionDefinition.getFunction(), functionDefinition.getMaxArgs());
 
-      // Add pattern
-      //      patterns.add(functionDefinition.getPattern());
-
       // Add function value
       functionToMethodMap.put(functionDefinition.getFunction(), getMethod(functionDefinition));
 
