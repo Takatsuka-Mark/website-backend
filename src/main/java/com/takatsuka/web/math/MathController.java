@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -34,11 +35,14 @@ public class MathController {
   @GetMapping(BASE_URL + "evaluate")
   public String evaluate(
       @RequestParam(name = "expression") String expression,
-      @RequestParam(name = "compPrecision", defaultValue = "10") int computationPrecision,
-      @RequestParam(name = "dispPrecision", defaultValue = "10") int displayPrecision,
+      @RequestParam(name = "compPrecision", required = false) int computationPrecision,
+      @RequestParam(name = "dispPrecision", required = false) int displayPrecision,
       HttpServletRequest request) {
     Bucket bucket = getBucketOrCreate(request.getRemoteAddr());
-    MathSettings mathSettings = new MathSettings(displayPrecision, computationPrecision);
+    // TODO determine if the parameters will be null or 0
+    MathSettings mathSettings =
+        new MathSettings(
+            Optional.ofNullable(displayPrecision), Optional.ofNullable(computationPrecision));
 
     if (bucket.tryConsume(1L)) {
       return mathService.evaluateExpression(expression, mathSettings);

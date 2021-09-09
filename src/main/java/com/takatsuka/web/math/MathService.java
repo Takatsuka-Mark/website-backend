@@ -43,7 +43,7 @@ public class MathService {
     Stopwatch stopwatch = Stopwatch.createStarted();
 
     try {
-      DoEval doEval = new DoEval(expression);
+      DoEval doEval = new DoEval(expression, mathSettings);
       result = timeLimiter.callWithTimeout(doEval, EXEC_TIME_LIMIT);
     } catch(MathException exception){
       logger.error(exception.toString());
@@ -80,13 +80,15 @@ public class MathService {
 
   private class DoEval implements Callable<String> {
     private final String expression;
+    private final MathSettings mathSettings;
 
-    public DoEval(String expression) {
+    public DoEval(String expression, MathSettings mathSettings) {
       this.expression = expression;
+      this.mathSettings = mathSettings;
     }
 
     public String call() {
-      return mathParser.evaluate(expression);
+      return mathParser.evaluate(expression, mathSettings);
     }
   }
 }

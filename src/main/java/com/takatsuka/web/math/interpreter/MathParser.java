@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.takatsuka.web.interpreter.ExpressionEntry;
 import com.takatsuka.web.interpreter.Function;
 import com.takatsuka.web.logging.MathLogger;
+import com.takatsuka.web.math.MathSettings;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -33,7 +34,11 @@ public class MathParser {
     evaluator = new Evaluator(functionMapper);
   }
 
-  public String evaluate(String expression) {
+  public String evaluate(String expression){
+    return evaluate(expression, new MathSettings());
+  }
+
+  public String evaluate(String expression, MathSettings mathSettings) {
     ArrayList<String> tokens = tokenize(expression);
     return evaluate(tokens);
   }
