@@ -30,4 +30,5 @@ sudo certbot renew
 
 cd /etc/letsencrypt/live/[cert_name]
 openssl pkcs12 -export -in fullchain.pem -inkey privkey.pem -out keystore.p12 -name backend -CAfile chain.pem -caname root
+gsutil cp keystore.p12 gs://website-backend-keyfiles
 ```
