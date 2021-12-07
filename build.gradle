@@ -64,12 +64,20 @@ sourceSets {
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.12.4'
+        if (osdetector.os == "osx") {
+            artifact = 'com.google.protobuf:protoc:3.12.4:osx-x86_64'
+        } else {
+            artifact = 'com.google.protobuf:protoc:3.12.4'
+        }
     }
 
     plugins {
         grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.25.0'
+            if (osdetector.os == "osx") {
+                artifact = 'io.grpc:protoc-gen-grpc-java:1.25.0:osx-x86_64'
+            } else {
+                artifact = 'io.grpc:protoc-gen-grpc-java:1.25.0'
+            }
         }
     }
 
