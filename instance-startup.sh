@@ -14,11 +14,11 @@ gsutil cp -r gs://"${BUCKET}"/"${JARFILE}" ./website-backend-builds/
 
 # Install dependencies
 apt-get update
-apt-get -y --force-yes install openjdk-11-jdk
+#apt-get -y --force-yes install openjdk-17-jdk
 
 # Make Java 8 default
-update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/jre/bin/java
+#update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/jre/bin/java
 
 # Start server
 export spring_profiles_active=prod
-java -jar /website-backend-builds/"${JARFILE}"
+#java -jar /website-backend-builds/"${JARFILE}"
