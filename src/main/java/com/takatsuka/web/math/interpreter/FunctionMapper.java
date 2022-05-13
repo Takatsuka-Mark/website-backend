@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 public class FunctionMapper {
   private static final String SYMBOL_GROUPS = "([+\\-*/%^!()])";
-  private static final String NUM_REGEX = "(-?\\d+([.]\\d+)?)";
+  private static final String NUM_REGEX = "(((?<=[+\\-*`/%^(]|^)-)?\\d+([.]\\d+)?)";
   private static final String FUNC_REGEX = "(\\w+)";
 
   private final Map<String, Function> multiVariableFunctionMap;
