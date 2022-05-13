@@ -34,7 +34,7 @@ public class MathParser {
   }
 
   public String evaluate(String expression) {
-    ArrayList<String> tokens = tokenize(expression);
+    ArrayList<String> tokens = tokenize(expression.replaceAll("[\\n\\r\\s]+", ""));
     return evaluate(tokens);
   }
 
@@ -55,6 +55,7 @@ public class MathParser {
       tokens.add(tok);
     }
 
+    System.out.println(tokens);
     logger.debug("Expression '{}' successfully tokenized to '{}'", expression, tokens.toString());
 
     return tokens;
@@ -120,22 +121,12 @@ public class MathParser {
           funcId += 1;
           int level;
           Function function = functionMapper.mapStringToFunction(token);
-          switch (Objects.requireNonNull(function)) {
-            case ADD:
-            case SUBTRACT:
-              level = 1;
-              break;
-            case MULTIPLY:
-            case DIVIDE:
-              level = 2;
-              break;
-            case POWER:
-              level = 3;
-              break;
-            default:
-              level = 10;
-              break;
-          }
+          level = switch (Objects.requireNonNull(function)) {
+            case ADD, SUBTRACT -> 1;
+            case MULTIPLY, DIVIDE -> 2;
+            case POWER -> 3;
+            default -> 10;
+          };
 
           ExpressionEntry.Builder expressionBuilder = ExpressionEntry.newBuilder();
           expressionBuilder
