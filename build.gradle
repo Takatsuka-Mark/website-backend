@@ -35,7 +35,7 @@ dependencies {
 }
 
 group = 'com.takatsuka'
-version = '0.0.6'
+version = '0.0.7'
 description = 'web'
 sourceCompatibility = '11'
 
@@ -51,6 +51,9 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+springBoot {
+    buildInfo()
+}
 
 sourceSets {
     main {
@@ -60,7 +63,6 @@ sourceSets {
         }
     }
 }
-
 
 protobuf {
     protoc {
