@@ -2,13 +2,14 @@ package com.takatsuka.web.math.interpreter;
 
 import com.google.common.math.BigIntegerMath;
 import com.takatsuka.web.interpreter.Function;
-import com.takatsuka.web.interpreter.ParamType;
 import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.math.evaluators.BasicEvaluator;
 import com.takatsuka.web.math.evaluators.ExponentialEvaluator;
+import com.takatsuka.web.math.evaluators.EvaluatorGrouping;
 import com.takatsuka.web.math.evaluators.RandomEvaluator;
 import com.takatsuka.web.math.evaluators.TrigEvaluator;
 import com.takatsuka.web.utils.exceptions.MathExecException;
+
 import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
@@ -17,33 +18,36 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Queue;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class Evaluator {
   private static final Logger logger = MathLogger.forCallingClass();
 
   public static final String DEFAULT = BigDecimal.ZERO.toString();
   private final MathContext mathContext;
-  private final BasicEvaluator basicEvaluator;
-  private final RandomEvaluator randomEvaluator;
-  private final ExponentialEvaluator exponentialEvaluator;
-  private final TrigEvaluator trigEvaluator;
-  private final Map<Function, Method> methodMap;
-  private final FunctionMapper functionMapper;
+  private final HashMap<Function, HashMap<String, Method>> newMethodMap; 
+  private final List<EvaluatorGrouping> allEvaluators;
 
   public Evaluator(FunctionMapper functionMapper) {
     this(100, functionMapper);
   }
 
   public Evaluator(int precision, FunctionMapper functionMapper) {
+    // TODO(mark): make this final once math_context is moved to method.
+    allEvaluators = new ArrayList<>();
     mathContext = new MathContext(precision);
-    basicEvaluator = new BasicEvaluator(mathContext);
-    randomEvaluator = new RandomEvaluator(mathContext);
-    exponentialEvaluator = new ExponentialEvaluator(mathContext);
-    trigEvaluator = new TrigEvaluator(mathContext);
-    this.functionMapper = functionMapper;
-    this.methodMap = functionMapper.getFunctionToMethodMap();
+    // Could find these classes with a reflection https://www.baeldung.com/java-find-all-classes-in-package
+    allEvaluators.add(new BasicEvaluator(mathContext));
+    allEvaluators.add(new RandomEvaluator(mathContext));
+    allEvaluators.add(new ExponentialEvaluator(mathContext));
+    allEvaluators.add(new TrigEvaluator(mathContext));
+
+    this.newMethodMap = functionMapper.mapEvalsToMethods(allEvaluators);
   }
 
   public String evaluateFunction(Function function, List<String> args) {
@@ -77,31 +81,29 @@ public class Evaluator {
       case MOD:
         return String.valueOf(new BigInteger(args.get(0)).mod(new BigInteger(args.get(1))));
       case POWER:
-        return exponentialEvaluator.pow(new BigDecimal(args.get(0)), new BigInteger(args.get(1)));
+        // TODO placeholder until these are converted to funcs.
+        return ((ExponentialEvaluator)(allEvaluators.get(2))).pow(new BigDecimal(args.get(0)), new BigInteger(args.get(1)));
       case FACTORIAL:
         return String.valueOf(BigIntegerMath.factorial(Integer.parseInt(args.get(0))));
       case INT_DIVIDE:
         return String.valueOf(new BigInteger(args.get(0)).divide(new BigInteger(args.get(1))));
+      default:
+        break;
     }
+    HashMap<String, Method> methodCandidates = this.newMethodMap.get(function);
 
-    // It is not a basic operation.
-    Method method = methodMap.get(function);
-    if (method.getDeclaringClass().equals(BasicEvaluator.class)) {
-      return evaluateDynamicFunction(basicEvaluator, method, function, args);
-    } else if (method.getDeclaringClass().equals(RandomEvaluator.class)) {
-      return evaluateDynamicFunction(randomEvaluator, method, function, args);
-    } else if (method.getDeclaringClass().equals(ExponentialEvaluator.class)) {
-      return evaluateDynamicFunction(exponentialEvaluator, method, function, args);
-    } else if (method.getDeclaringClass().equals(TrigEvaluator.class)) {
-      return evaluateDynamicFunction(trigEvaluator, method, function, args);
-    }
+    // TODO this is just for testing - select only one class
+    Entry<String, Method> method = methodCandidates.entrySet().iterator().next();
 
-    return DEFAULT;
+    EvaluatorGrouping evalClass = (EvaluatorGrouping) this.allEvaluators.stream().filter(eval -> eval.getClass() == method.getValue().getDeclaringClass()).collect(Collectors.toList()).toArray()[0];
+
+    return evaluateDynamicFunction(evalClass, method.getValue(), function, args, method.getKey());
   }
 
   private String evaluateDynamicFunction(
-      Object executorClass, Method method, Function function, List<String> args) {
-    List<Object> params = parseParams(args, functionMapper.getParamTypeList(function));
+    Object executorClass, Method method, Function function, List<String> args, String paramTypes
+  ) {
+    List<Object> params = parseParams(args, paramTypes);
     try {
       return method.invoke(executorClass, params.toArray()).toString();
     } catch (IllegalAccessException | InvocationTargetException e) {
@@ -110,49 +112,50 @@ public class Evaluator {
     }
   }
 
-  private List<Object> parseParams(List<String> args, List<ParamType> paramTypes) {
+  private List<Object> parseParams(List<String> args, String paramTypes) {
     List<Object> finalArgs = new ArrayList<>();
-
-    // Cover the n param functions.
-    if (paramTypes.get(0) == ParamType.BIG_DECIMAL_LIST) {
-      List<BigDecimal> argsList = new ArrayList<>();
-      for (String arg : args) {
-        argsList.add(new BigDecimal(arg));
-      }
-      finalArgs.add(argsList);
-      return finalArgs;
-    } else if (paramTypes.get(0) == ParamType.BIG_INTEGER_LIST) {
+    System.out.println(paramTypes);
+    // TODO improve this
+    if (paramTypes.equals("Z+")) {
       List<BigInteger> argsList = new ArrayList<>();
       for (String arg : args) {
         argsList.add(new BigInteger(arg));
       }
       finalArgs.add(argsList);
       return finalArgs;
+    } else if (paramTypes.equals("R+")) {
+      List<BigDecimal> argsList = new ArrayList<>();
+      for (String arg : args) {
+        argsList.add(new BigDecimal(arg));
+      }
+      finalArgs.add(argsList);
+      return finalArgs;
     }
 
-    // Cover functions with a discrete number of parameters.
-    for (int i = 0; i < args.size(); i++) {
-      ParamType paramType;
-      if (i < paramTypes.size()) {
-        paramType = paramTypes.get(i);
-      } else {
-        paramType = paramTypes.get(paramTypes.size() - 1);
-      }
 
-      switch (paramType) {
-        case DECIMAL:
-          finalArgs.add(Double.valueOf(args.get(i)));
+    Queue<String> argQueue = new LinkedList<String>(args);
+
+    for (char argChar : paramTypes.toCharArray()) {
+      String thisArg = argQueue.poll();
+      switch(argChar) {
+        case 'Z':
+          finalArgs.add(new BigInteger(thisArg));
           break;
-        case INTEGER:
-          finalArgs.add(Integer.parseInt(args.get(i)));
+        case 'R':
+          finalArgs.add(new BigDecimal(thisArg));
           break;
-        case BIG_DECIMAL:
-          finalArgs.add(new BigDecimal(args.get(i)));
+        case 'z':
+          finalArgs.add(Integer.parseInt(thisArg));
           break;
-        case BIG_INTEGER:
-          finalArgs.add(new BigInteger(args.get(i)));
+        case 'r':
+          finalArgs.add(Double.parseDouble(thisArg));
           break;
       }
+    }
+
+    if (!argQueue.isEmpty()) {
+      // TODO fix message.
+      throw new RuntimeException("There are an improper number of arguments");
     }
 
     return finalArgs;

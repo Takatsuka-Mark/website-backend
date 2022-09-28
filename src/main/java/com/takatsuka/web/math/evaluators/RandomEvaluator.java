@@ -2,12 +2,16 @@ package com.takatsuka.web.math.evaluators;
 
 import org.springframework.stereotype.Component;
 
+import com.takatsuka.web.math.utils.MathEvaluator;
+import com.takatsuka.web.math.utils.MathMethod;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Random;
 
-public class RandomEvaluator {
+@MathEvaluator
+public class RandomEvaluator implements EvaluatorGrouping {
 
   private final MathContext mathContext;
   private final Random randomSource;
@@ -17,6 +21,7 @@ public class RandomEvaluator {
     this.randomSource = new Random();
   }
 
+  @MathMethod("ZZ")
   public String randomInt(BigInteger min, BigInteger max) {
     BigInteger randomNumber;
     BigInteger diff = max.subtract(min);

@@ -1,13 +1,13 @@
 {
   "title": "Arc Cosecant",
   "description": "Calculates the Arc Cosecant of a number",
-  "pattern": "acsc",
+  "symbol": "acsc",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
-    "methodName": "acsc",
-    "paramTypes": ["DECIMAL"]
+    "methodName": "acsc"
   },
-  "symbol": "acsc",
   "function": "COSECANT_INVERSE",
-  "maxArgs": 1
+  "param_pattern": "r",
+  "param_description": "",
+  "is_in_place": false
 }

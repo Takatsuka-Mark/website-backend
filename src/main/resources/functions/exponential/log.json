@@ -1,13 +1,13 @@
 {
   "title": "Log | Log base 10",
   "description": "Calculates the log base 10 of a value",
-  "pattern": "log",
+  "symbol": "log",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.ExponentialEvaluator",
-    "methodName": "log",
-    "paramTypes": ["BIG_DECIMAL"]
+    "methodName": "log"
   },
-  "symbol": "log",
   "function": "LOG",
-  "maxArgs": 1
+  "param_pattern": "r",
+  "param_description": "",
+  "is_in_place": false
 }

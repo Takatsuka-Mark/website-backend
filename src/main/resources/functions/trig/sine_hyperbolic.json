@@ -1,13 +1,13 @@
 {
   "title": "Hyperbolic Sine",
   "description": "Calculates the Hyperbolic Sine of a number",
-  "pattern": "sinh",
+  "symbol": "sinh",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
-    "methodName": "sinh",
-    "paramTypes": ["DECIMAL"]
+    "methodName": "sinh"
   },
-  "symbol": "sinh",
   "function": "SINE_HYPERBOLIC",
-  "maxArgs": 1
+  "param_pattern": "r",
+  "param_description": "",
+  "is_in_place": false
 }

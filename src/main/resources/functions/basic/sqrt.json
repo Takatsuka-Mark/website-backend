@@ -1,13 +1,13 @@
 {
   "title": "Square Root",
   "description": "Normal Square Root Function",
-  "pattern": "sqrt",
+  "symbol": "sqrt",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
-    "methodName": "squareRoot",
-    "paramTypes": ["BIG_DECIMAL"]
+    "methodName": "squareRoot"
   },
-  "symbol": "sqrt",
   "function": "SQUARE_ROOT",
-  "maxArgs": 1
+  "param_pattern": "R",
+  "param_description": "",
+  "is_in_place": false
 }

@@ -53,6 +53,7 @@ public class MathService {
     } catch(UncheckedExecutionException exception) {
       // TODO: Figure out why this exection is being thrown.
       //  This is a terrible way to check
+      exception.printStackTrace();
       if(exception.getCause() instanceof MathException){
         logger.error("Unchecked Exception: " + exception.getCause());
         result = exception.getCause().toString();
@@ -63,7 +64,6 @@ public class MathService {
     }
     catch (Exception e) {
       if(e.getCause() instanceof MathExecException){
-        logger.error(e.getCause().toString());
         result = e.getCause().toString();
       } else {
         logger.error("An error was caught by the catch-all: ", e);

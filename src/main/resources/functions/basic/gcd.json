@@ -1,13 +1,13 @@
 {
   "title": "Greatest Common Denominator",
   "description": "Finds the greatest common denominator in the set of parameters",
-  "pattern": "gcd",
+  "symbol": "gcd",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
-    "methodName": "gcd",
-    "paramTypes": ["BIG_INTEGER_LIST"]
+    "methodName": "gcd"
   },
-  "symbol": "gcd",
   "function": "GCD",
-  "maxArgs": 2147483647
+  "param_pattern": "Z+",
+  "param_description": "",
+  "is_in_place": false
 }

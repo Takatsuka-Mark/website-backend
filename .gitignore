@@ -22,14 +22,6 @@ application*.properties
 *.iml
 *.ipr
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-
 ### VS Code ###
 .vscode/
 /.mvn/
@@ -38,3 +30,6 @@ build/
 ### Gradle ###
 .gradle
 **/build/
+
+bin/
+**/.DS_Store

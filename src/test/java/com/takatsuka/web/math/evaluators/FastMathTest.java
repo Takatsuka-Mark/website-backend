@@ -7,15 +7,15 @@ import org.junit.jupiter.api.Test;
 import java.math.BigInteger;
 import java.util.Random;
 
-public class FastMath {
+public class FastMathTest {
   private final int NUM_RANDOM_TESTS = 10;
   private Random rand;
 
-  FastMath fastMath;
+  FastMathTest fastMath;
 
   @Before
   public void init() {
-    fastMath = new FastMath();
+    fastMath = new FastMathTest();
     rand = new Random();
   }
 

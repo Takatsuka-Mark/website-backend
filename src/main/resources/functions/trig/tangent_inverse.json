@@ -1,13 +1,13 @@
 {
   "title": "Arc Tangent",
   "description": "Calculates the Arc Tangent of a number",
-  "pattern": "atan",
+  "symbol": "atan",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
-    "methodName": "atan",
-    "paramTypes": ["DECIMAL"]
+    "methodName": "atan"
   },
-  "symbol": "atan",
   "function": "TANGENT_INVERSE",
-  "maxArgs": 1
+  "param_pattern": "r",
+  "param_description": "",
+  "is_in_place": false
 }

@@ -7,7 +7,6 @@ import com.takatsuka.web.logging.MathLogger;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -15,10 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class MathParser {
   private static final Logger logger = MathLogger.forCallingClass();
@@ -55,7 +52,7 @@ public class MathParser {
       tokens.add(tok);
     }
 
-    System.out.println(tokens);
+
     logger.debug("Expression '{}' successfully tokenized to '{}'", expression, tokens.toString());
 
     return tokens;
@@ -286,7 +283,9 @@ public class MathParser {
     String finalValue = "";
     for (Integer index : sequence) {
       ExpressionEntry expressionEntry = expressions.get(index);
-      finalValue =
+      // finalValue =
+      //     evaluator.evaluateFunction(expressionEntry.getFunction(), expressionEntry.getArgsList());
+        finalValue =
           evaluator.evaluateFunction(expressionEntry.getFunction(), expressionEntry.getArgsList());
       int argOf = expressionEntry.getArgOf();
       int argId = expressionEntry.getArgId();

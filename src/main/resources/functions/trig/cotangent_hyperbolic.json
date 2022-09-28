@@ -1,13 +1,13 @@
 {
   "title": "Hyperbolic Cotangent",
   "description": "Calculates the Hyperbolic Cotangent of a number",
-  "pattern": "coth",
+  "symbol": "coth",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
-    "methodName": "coth",
-    "paramTypes": ["DECIMAL"]
+    "methodName": "coth"
   },
-  "symbol": "coth",
   "function": "COTANGENT_HYPERBOLIC",
-  "maxArgs": 1
+  "param_pattern": "r",
+  "param_description": "",
+  "is_in_place": false
 }

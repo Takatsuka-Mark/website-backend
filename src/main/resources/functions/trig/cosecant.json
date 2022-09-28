@@ -1,13 +1,13 @@
 {
   "title": "Cosecant",
   "description": "Calculates the Cosecant of a number",
-  "pattern": "csc",
+  "symbol": "csc",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
-    "methodName": "csc",
-    "paramTypes": ["DECIMAL"]
+    "methodName": "csc"
   },
-  "symbol": "csc",
   "function": "COSECANT",
-  "maxArgs": 1
+  "param_pattern": "r",
+  "param_description": "",
+  "is_in_place": false
 }
