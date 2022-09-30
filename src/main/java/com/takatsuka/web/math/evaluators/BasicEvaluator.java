@@ -23,6 +23,11 @@ public class BasicEvaluator implements EvaluatorGrouping {
     this.mathContext = mathContext;
   }
 
+  @MathMethod("ZZ")
+  public String intDivide(BigInteger A, BigInteger B) {
+    return String.valueOf(A.divide(B));
+  }
+
   @MathMethod("R")
   public String absoluteValue(BigDecimal input) {
     return String.valueOf(input.abs(mathContext));

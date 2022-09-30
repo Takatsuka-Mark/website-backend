@@ -1,0 +1,13 @@
+{
+    "title": "Integer Division",
+    "description": "Computes the integer division of A // B",
+    "symbol": "//",
+    "mathMethod": {
+      "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
+      "methodName": "intDivide"
+    },
+    "function": "INT_DIVIDE",
+    "param_pattern": "ZZ",
+    "param_description": "",
+    "is_in_place": true
+  }

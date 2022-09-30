@@ -7,6 +7,8 @@ import com.takatsuka.web.math.evaluators.EvaluatorGrouping;
 import com.takatsuka.web.math.utils.MathMethod;
 import com.takatsuka.web.utils.exceptions.MathParseException;
 
+import javassist.compiler.ast.Symbol;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,12 +46,15 @@ public class FunctionMapper {
     functionToParamPattern = new HashMap<>();
     classMethodToFunction = new HashMap<>();
     ArrayList<String> patterns = new ArrayList<>();
-    patterns.add("//"); // Add integer division as so it is not parsed as two '/'
+    // patterns.add("//"); // Add integer division as so it is not parsed as two '/'
+
     patterns.add(NUM_REGEX);
-    patterns.add(SYMBOL_GROUPS);
+    // patterns.add(String.format("([%s%s])", symbolPatternBuilder, SYMBOL_GROUPS));
     patterns.add(FUNC_REGEX);
     patterns.add(",");
 
+    // TODO determine how the max arg map is used...
+    String symbolPatternBuilder = "";
     // Build multi-variable functions
     for (FunctionDefinition functionDefinition : functionsList) {
       // Map the symbol to the function
@@ -61,10 +66,23 @@ public class FunctionMapper {
 
       // Add function value
       // functionToMethodMap.put(functionDefinition.getFunction(), getMethod(functionDefinition));
-
-      functionToParamPattern.put(
-        functionDefinition.getFunction(), Pattern.compile(functionDefinition.getParamPattern())
-      );
+      if (functionDefinition.getIsInPlace()) {
+        // symbolPatternBuilder += functionDefinition.getSymbol();
+        if (functionDefinition.getFunction() == Function.INT_DIVIDE) {
+          // TODO this is terrible, but function division takes presidence in regex over everything
+          patterns.add(functionDefinition.getSymbol());
+        } else {
+          symbolPatternBuilder += functionDefinition.getSymbol();
+        }
+        symbolOperatorMap.put(functionDefinition.getSymbol(), functionDefinition.getFunction());
+        // functionToParamPattern.put(
+        //   functionDefinition.getFunction(), Pattern.compile(functionDefinition.getParamPattern())
+        // );
+      } else {
+        functionToParamPattern.put(
+          functionDefinition.getFunction(), Pattern.compile(functionDefinition.getParamPattern())
+        );
+      }
   
       // functionToParamTypeMap.put(
       //     functionDefinition.getFunction(), functionDefinition.getMathMethod().getParamTypesList());
@@ -73,10 +91,13 @@ public class FunctionMapper {
       tmp.put(functionDefinition.getMathMethod().getMethodName(), functionDefinition.getFunction());
       classMethodToFunction.put(className, tmp);
     }
+    patterns.add(String.format("([%s%s])", SYMBOL_GROUPS, symbolPatternBuilder));
+
+    // patterns.add(SYMBOL_GROUPS);
 
     // Build operators
-    symbolOperatorMap.put("//", Function.INT_DIVIDE);
-    functionToMaxArgMap.put(Function.INT_DIVIDE, 2);
+    // symbolOperatorMap.put("//", Function.INT_DIVIDE);
+    // functionToMaxArgMap.put(Function.INT_DIVIDE, 2);
     symbolOperatorMap.put("+", Function.ADD);
     functionToMaxArgMap.put(Function.ADD, 2);
     symbolOperatorMap.put("-", Function.SUBTRACT);

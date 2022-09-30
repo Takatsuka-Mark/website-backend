@@ -85,8 +85,8 @@ public class Evaluator {
         return ((ExponentialEvaluator)(allEvaluators.get(2))).pow(new BigDecimal(args.get(0)), new BigInteger(args.get(1)));
       case FACTORIAL:
         return String.valueOf(BigIntegerMath.factorial(Integer.parseInt(args.get(0))));
-      case INT_DIVIDE:
-        return String.valueOf(new BigInteger(args.get(0)).divide(new BigInteger(args.get(1))));
+      // case INT_DIVIDE:
+        // return String.valueOf(new BigInteger(args.get(0)).divide(new BigInteger(args.get(1))));
       default:
         break;
     }
