@@ -15,6 +15,8 @@ message FunctionDefinition{
     // The regex pattern to match
     string symbol = 3;
 
+    bool symbol_is_regex = 11;
+
     MathMethod math_method = 5;
 
     string param_pattern = 6;
@@ -26,6 +28,8 @@ message FunctionDefinition{
     int32 max_args = 9;
 
     bool is_in_place = 10;
+
+    string regex = 12;
 }
 
 message MathMethod {

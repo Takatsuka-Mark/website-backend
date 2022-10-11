@@ -1,0 +1,14 @@
+{
+    "title": "Addition",
+    "description": "Computes the addition of A + B",
+    "symbol": "+",
+    "regex": "[+]",
+    "mathMethod": {
+      "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
+      "methodName": "add"
+    },
+    "function": "ADD",
+    "param_pattern": "RR",
+    "param_description": "",
+    "is_in_place": true
+}

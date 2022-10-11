@@ -1,0 +1,14 @@
+{
+    "title": "Exponentiation",
+    "description": "Computes the exponentiation of A ^ B",
+    "symbol": "^",
+    "regex": "\\^",
+    "mathMethod": {
+      "className": "com.takatsuka.web.math.evaluators.ExponentialEvaluator",
+      "methodName": "pow"
+    },
+    "function": "POWER",
+    "param_pattern": "RZ",
+    "param_description": "",
+    "is_in_place": true
+}

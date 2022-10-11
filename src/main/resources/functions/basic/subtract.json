@@ -1,0 +1,13 @@
+{
+    "title": "Subtract",
+    "description": "Computes the subtraction of A - B",
+    "symbol": "-",
+    "mathMethod": {
+      "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
+      "methodName": "subtract"
+    },
+    "function": "SUBTRACT",
+    "param_pattern": "RR",
+    "param_description": "",
+    "is_in_place": true
+}

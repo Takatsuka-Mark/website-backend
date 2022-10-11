@@ -4,6 +4,8 @@ import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.math.interpreter.Evaluator;
 import com.takatsuka.web.math.utils.MathEvaluator;
 import com.takatsuka.web.math.utils.MathMethod;
+import com.takatsuka.web.utils.exceptions.MathExecException;
+import com.takatsuka.web.utils.exceptions.MathExecException.MathExecExceptionType;
 
 import org.slf4j.Logger;
 
@@ -23,8 +25,47 @@ public class BasicEvaluator implements EvaluatorGrouping {
     this.mathContext = mathContext;
   }
 
+  @MathMethod("RR")
+  public String add(BigDecimal A, BigDecimal B) {
+    return String.valueOf(A.add(B));
+  }
+
+  @MathMethod("RR")
+  public String subtract(BigDecimal A, BigDecimal B) {
+    return String.valueOf(A.subtract(B));
+  }
+
+  @MathMethod("RR")
+  public String multiply(BigDecimal A, BigDecimal B) {
+    return String.valueOf(A.multiply(B));
+  }
+
+  @MathMethod("ZZ")
+  public String modulous(BigInteger A, BigInteger B) {
+    return String.valueOf(A.mod(B));
+  }
+
+  @MathMethod("RR")
+  public String divide(BigDecimal A, BigDecimal B) {
+    if (B.equals(BigDecimal.ZERO)) {
+      throw new MathExecException(
+        String.format("%s / %s", A.toString(), B.toString()),
+        null,
+        MathExecExceptionType.DIV_BY_ZERO
+      );
+    }
+    return String.valueOf(A.divide(B));
+  }
+
   @MathMethod("ZZ")
   public String intDivide(BigInteger A, BigInteger B) {
+    if (B.equals(BigInteger.ZERO)) {
+      throw new MathExecException(
+        String.format("%s / %s", A.toString(), B.toString()),
+        null,
+        MathExecExceptionType.DIV_BY_ZERO
+      );
+    }
     return String.valueOf(A.divide(B));
   }
 

@@ -8,7 +8,6 @@ import com.takatsuka.web.math.evaluators.ExponentialEvaluator;
 import com.takatsuka.web.math.evaluators.EvaluatorGrouping;
 import com.takatsuka.web.math.evaluators.RandomEvaluator;
 import com.takatsuka.web.math.evaluators.TrigEvaluator;
-import com.takatsuka.web.utils.exceptions.MathExecException;
 
 import org.slf4j.Logger;
 
@@ -57,36 +56,8 @@ public class Evaluator {
       case UNKNOWN_FUNCTION:
         // The function is unknown, just return the args if available.
         return args.get(0);
-
-        // Symbol Functions (Excluding FAC)
-      case ADD:
-        return String.valueOf(
-            new BigDecimal(args.get(0)).add(new BigDecimal(args.get(1)), mathContext));
-      case SUBTRACT:
-        return String.valueOf(
-            new BigDecimal(args.get(0)).subtract(new BigDecimal(args.get(1)), mathContext));
-      case MULTIPLY:
-        return String.valueOf(
-            new BigDecimal(args.get(0)).multiply(new BigDecimal(args.get(1)), mathContext));
-      case DIVIDE:
-        BigDecimal param1 = new BigDecimal(args.get(0));
-        BigDecimal param2 = new BigDecimal(args.get(1));
-        if (param2.equals(BigDecimal.ZERO)) {
-          throw new MathExecException(
-              String.format("%s / %s", param1.toString(), param2.toString()),
-              null,
-              MathExecException.MathExecExceptionType.DIV_BY_ZERO);
-        }
-        return String.valueOf(param1.divide(param2, mathContext));
-      case MOD:
-        return String.valueOf(new BigInteger(args.get(0)).mod(new BigInteger(args.get(1))));
-      case POWER:
-        // TODO placeholder until these are converted to funcs.
-        return ((ExponentialEvaluator)(allEvaluators.get(2))).pow(new BigDecimal(args.get(0)), new BigInteger(args.get(1)));
       case FACTORIAL:
         return String.valueOf(BigIntegerMath.factorial(Integer.parseInt(args.get(0))));
-      // case INT_DIVIDE:
-        // return String.valueOf(new BigInteger(args.get(0)).divide(new BigInteger(args.get(1))));
       default:
         break;
     }
@@ -114,7 +85,6 @@ public class Evaluator {
 
   private List<Object> parseParams(List<String> args, String paramTypes) {
     List<Object> finalArgs = new ArrayList<>();
-    System.out.println(paramTypes);
     // TODO improve this
     if (paramTypes.equals("Z+")) {
       List<BigInteger> argsList = new ArrayList<>();
@@ -131,7 +101,6 @@ public class Evaluator {
       finalArgs.add(argsList);
       return finalArgs;
     }
-
 
     Queue<String> argQueue = new LinkedList<String>(args);
 

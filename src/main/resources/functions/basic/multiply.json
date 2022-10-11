@@ -1,0 +1,14 @@
+{
+    "title": "Multiplication",
+    "description": "Computes the multiplication of A * B",
+    "symbol": "*",
+    "regex": "[*]",
+    "mathMethod": {
+      "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
+      "methodName": "multiply"
+    },
+    "function": "MULTIPLY",
+    "param_pattern": "RR",
+    "param_description": "",
+    "is_in_place": true
+}

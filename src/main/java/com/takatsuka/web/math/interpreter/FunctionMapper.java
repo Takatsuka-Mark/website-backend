@@ -7,15 +7,11 @@ import com.takatsuka.web.math.evaluators.EvaluatorGrouping;
 import com.takatsuka.web.math.utils.MathMethod;
 import com.takatsuka.web.utils.exceptions.MathParseException;
 
-import javassist.compiler.ast.Symbol;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -23,13 +19,15 @@ import org.slf4j.Logger;
 public class FunctionMapper {
   private static final Logger logger = MathLogger.forCallingClass();
 
-  private static final String SYMBOL_GROUPS = "([+\\-*/%^!()])";
-  private static final String NUM_REGEX = "(((?<=[+\\-*`/%^(]|^)-)?\\d+([.]\\d+)?)";
+  private static final String SYMBOL_GROUPS = "([!()])";
+  private static final String NUM_REGEX = "(-?\\d+(\\.\\d+)?)";
+  private static final Pattern NUM_PATTERN = Pattern.compile(NUM_REGEX);
   private static final String FUNC_REGEX = "(\\w+)";
   private static final String EVALUATOR_PACKAGE_PATH = "";
-
+  
   private final Map<String, Function> multiVariableFunctionMap;
   private final Map<String, Function> symbolOperatorMap;
+  private final Map<Pattern, Function> patternOperatorMap;
   private final Map<Function, Integer> functionToMaxArgMap;
   private final Map<Function, Method> functionToMethodMap;
   // private final Map<Function, List<ParamType>> functionToParamTypeMap;
@@ -45,16 +43,13 @@ public class FunctionMapper {
     // functionToParamTypeMap = new HashMap<>();
     functionToParamPattern = new HashMap<>();
     classMethodToFunction = new HashMap<>();
+    patternOperatorMap = new HashMap<>();
     ArrayList<String> patterns = new ArrayList<>();
-    // patterns.add("//"); // Add integer division as so it is not parsed as two '/'
 
     patterns.add(NUM_REGEX);
-    // patterns.add(String.format("([%s%s])", symbolPatternBuilder, SYMBOL_GROUPS));
     patterns.add(FUNC_REGEX);
     patterns.add(",");
 
-    // TODO determine how the max arg map is used...
-    String symbolPatternBuilder = "";
     // Build multi-variable functions
     for (FunctionDefinition functionDefinition : functionsList) {
       // Map the symbol to the function
@@ -65,19 +60,19 @@ public class FunctionMapper {
       functionToMaxArgMap.put(functionDefinition.getFunction(), functionDefinition.getMaxArgs());
 
       // Add function value
-      // functionToMethodMap.put(functionDefinition.getFunction(), getMethod(functionDefinition));
       if (functionDefinition.getIsInPlace()) {
-        // symbolPatternBuilder += functionDefinition.getSymbol();
-        if (functionDefinition.getFunction() == Function.INT_DIVIDE) {
-          // TODO this is terrible, but function division takes presidence in regex over everything
-          patterns.add(functionDefinition.getSymbol());
+        if (!functionDefinition.getRegex().equals("")) {
+          patterns.add(functionDefinition.getRegex());
         } else {
-          symbolPatternBuilder += functionDefinition.getSymbol();
+          patterns.add(functionDefinition.getSymbol());
         }
+
+        if (functionDefinition.getSymbolIsRegex()) {
+          // TODO this is not in use atm. We need some way to define that there is a regex symbol...
+          patternOperatorMap.put(Pattern.compile(functionDefinition.getSymbol()), functionDefinition.getFunction());
+        }
+        // TODO should we still add to the symbol operator map?
         symbolOperatorMap.put(functionDefinition.getSymbol(), functionDefinition.getFunction());
-        // functionToParamPattern.put(
-        //   functionDefinition.getFunction(), Pattern.compile(functionDefinition.getParamPattern())
-        // );
       } else {
         functionToParamPattern.put(
           functionDefinition.getFunction(), Pattern.compile(functionDefinition.getParamPattern())
@@ -91,26 +86,10 @@ public class FunctionMapper {
       tmp.put(functionDefinition.getMathMethod().getMethodName(), functionDefinition.getFunction());
       classMethodToFunction.put(className, tmp);
     }
-    patterns.add(String.format("([%s%s])", SYMBOL_GROUPS, symbolPatternBuilder));
+    patterns.add(String.format("%s", SYMBOL_GROUPS));
 
-    // patterns.add(SYMBOL_GROUPS);
-
-    // Build operators
-    // symbolOperatorMap.put("//", Function.INT_DIVIDE);
-    // functionToMaxArgMap.put(Function.INT_DIVIDE, 2);
-    symbolOperatorMap.put("+", Function.ADD);
-    functionToMaxArgMap.put(Function.ADD, 2);
-    symbolOperatorMap.put("-", Function.SUBTRACT);
-    functionToMaxArgMap.put(Function.SUBTRACT, 2);
-    symbolOperatorMap.put("*", Function.MULTIPLY);
-    functionToMaxArgMap.put(Function.MULTIPLY, 2);
-    symbolOperatorMap.put("/", Function.DIVIDE);
-    functionToMaxArgMap.put(Function.DIVIDE, 2);
-    symbolOperatorMap.put("%", Function.MOD);
-    functionToMaxArgMap.put(Function.MOD, 2);
-    symbolOperatorMap.put("^", Function.POWER);
-    functionToMaxArgMap.put(Function.POWER, 2);
-    symbolOperatorMap.put("!", Function.FACTORIAL); // TODO(Mark): Added this.
+    // Build operator
+    symbolOperatorMap.put("!", Function.FACTORIAL);
     functionToMaxArgMap.put(Function.FACTORIAL, 1);
 
     pattern = Pattern.compile(String.join("|", patterns));
@@ -132,11 +111,16 @@ public class FunctionMapper {
     if (symbolOperatorMap.containsKey(token)) {
       return symbolOperatorMap.get(token);
     }
+    for (Map.Entry<Pattern, Function> entry : patternOperatorMap.entrySet()) {
+      if (entry.getKey().matcher(token).find()) {
+        return entry.getValue();
+      }
+    }
     throw new MathParseException(token, null, MathParseException.ParseExceptionType.FUNCTION_NOT_DEFINED);
   }
 
   public int getMaxArgs(Function function) {
-    return functionToMaxArgMap.get(function);
+    return functionToMaxArgMap.getOrDefault(function, 2);
   }
 
   public boolean isMultiVariableFunction(String symbol) {
@@ -148,18 +132,19 @@ public class FunctionMapper {
   }
 
   public boolean isSymbolFunction(String symbol) {
-    return symbolOperatorMap.containsKey(symbol);
+    if (symbolOperatorMap.containsKey(symbol)) {
+      return true;
+    }
+    for (Pattern key : patternOperatorMap.keySet()) {
+      if (key.matcher(symbol).find()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public boolean isSymbolFunction(Function function) {
     return symbolOperatorMap.containsValue(function);
-  }
-
-  public Set<String> getAllSymbols() {
-    Set<String> tmp = new HashSet<>();
-    tmp.addAll(multiVariableFunctionMap.keySet());
-    tmp.addAll(symbolOperatorMap.keySet());
-    return tmp;
   }
 
   public Pattern getPattern() {
@@ -168,6 +153,10 @@ public class FunctionMapper {
 
   public String getNumRegex() {
     return NUM_REGEX;
+  }
+
+  public Pattern getNumPattern() {
+    return NUM_PATTERN;
   }
 
   // Maps the function name to list of Hash maps mapping arg pattern to the method
