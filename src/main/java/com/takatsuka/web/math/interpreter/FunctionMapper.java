@@ -46,7 +46,6 @@ public class FunctionMapper {
     patternOperatorMap = new HashMap<>();
     ArrayList<String> patterns = new ArrayList<>();
 
-    patterns.add(NUM_REGEX);
     patterns.add(FUNC_REGEX);
     patterns.add(",");
 
@@ -57,7 +56,13 @@ public class FunctionMapper {
           functionDefinition.getSymbol().toLowerCase(), functionDefinition.getFunction());
 
       // Map the function to max-args.
-      functionToMaxArgMap.put(functionDefinition.getFunction(), functionDefinition.getMaxArgs());
+      if (functionDefinition.getIsInPlace()){
+        functionToMaxArgMap.put(functionDefinition.getFunction(), 2);
+      } else {
+        functionToMaxArgMap.put(functionDefinition.getFunction(), functionDefinition.getMaxArgs());
+      }
+
+
 
       // Add function value
       if (functionDefinition.getIsInPlace()) {
@@ -86,6 +91,7 @@ public class FunctionMapper {
       tmp.put(functionDefinition.getMathMethod().getMethodName(), functionDefinition.getFunction());
       classMethodToFunction.put(className, tmp);
     }
+    patterns.add(NUM_REGEX);
     patterns.add(String.format("%s", SYMBOL_GROUPS));
 
     // Build operator
@@ -120,6 +126,7 @@ public class FunctionMapper {
   }
 
   public int getMaxArgs(Function function) {
+    // This should be deprecated. We can determine the number of args based on the regex, so this shouldn't be necessary.
     return functionToMaxArgMap.getOrDefault(function, 2);
   }
 

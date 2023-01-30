@@ -136,7 +136,7 @@ public class MathParserTest {
             ExpressionEntry.newBuilder()
                 .setId(2)
                 .setFunction(Function.SQUARE_ROOT)
-                .setMaxArg(1)
+//                .setMaxArg(1)
                 .addArgs("9")
                 .setLevel(10)
                 .build(),
@@ -151,7 +151,7 @@ public class MathParserTest {
             ExpressionEntry.newBuilder()
                 .setId(4)
                 .setFunction(Function.SQUARE_ROOT)
-                .setMaxArg(1)
+//                .setMaxArg(1)
                 .addArgs("100")
                 .setLevel(10)
                 .build());

@@ -12,7 +12,6 @@ message FunctionDefinition{
 
     string description = 2;
 
-    // The regex pattern to match
     string symbol = 3;
 
     bool symbol_is_regex = 11;

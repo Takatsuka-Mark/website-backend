@@ -55,6 +55,7 @@ public class Evaluator {
     switch (function) {
       case UNKNOWN_FUNCTION:
         // The function is unknown, just return the args if available.
+        System.out.println("Unknown function");
         return args.get(0);
       case FACTORIAL:
         return String.valueOf(BigIntegerMath.factorial(Integer.parseInt(args.get(0))));
@@ -74,6 +75,9 @@ public class Evaluator {
   private String evaluateDynamicFunction(
     Object executorClass, Method method, Function function, List<String> args, String paramTypes
   ) {
+    System.out.println("Evaluate dynamic function:");
+    System.out.println(function.toString());
+    System.out.println(args.toString());
     List<Object> params = parseParams(args, paramTypes);
     try {
       return method.invoke(executorClass, params.toArray()).toString();

@@ -52,7 +52,6 @@ public class MathParser {
       tokens.add(tok);
     }
 
-
     logger.debug("Expression '{}' successfully tokenized to '{}'", expression, tokens.toString());
 
     return tokens;
@@ -67,7 +66,7 @@ public class MathParser {
     int argPriority = 0;
     int funcId = 0;
     int outstandingParams = 0;
-
+    System.out.println("tokens" + tokens.toString());
     for (int i = 0; i < tokens.size(); i++) {
       String token = tokens.get(i);
       if (token.matches("[(]")) {
@@ -97,6 +96,7 @@ public class MathParser {
           } while (requiredClosingParen > 0);
           i -= 1;
 
+//          secondaryTokens.remove(0);
           secondaryTokens.remove(secondaryTokens.size() - 1); // Remove the last token ')'
           String result = String.valueOf(evaluate(secondaryTokens));
           expressionTable.put(
@@ -109,7 +109,6 @@ public class MathParser {
         argPriority -= 10;
       } else {
         // It is not a paren.
-
         if (token.matches(functionMapper.getNumRegex())) {
           // It is a number.
           argBackup.add(token);
@@ -135,7 +134,7 @@ public class MathParser {
           // We shouldn't have to make this call to FunctionMapper twice.
           if (functionMapper.isSymbolFunction(token)) {
             // This is of the form ' a [function] b '
-            if (!argBackup.isEmpty()) {
+            if (!argBackup.isEmpty() && function != Function.FACTORIAL) {
               // Add it as another variable
               expressionBuilder.addArgs(argBackup.remove());
             }
@@ -143,7 +142,7 @@ public class MathParser {
             // This is of the form ' [function]( a ) '
             outstandingParams += 1;
           }
-
+          System.out.println("Saving max args" + expressionBuilder.getMaxArg() + "\t for func" + expressionBuilder.getFunction());
           expressionTable.put(funcId, expressionBuilder.build());
         }
       }
@@ -151,18 +150,20 @@ public class MathParser {
 
     // Make sure we don't bypass the final value.
     if (!argBackup.isEmpty()) {
+      System.out.println("Not skipping final value: " + argBackup.toString());
       if (expressionTable.size() > 0) {
         // There must be a previous function. Add it as an arg.
         int idx = Collections.max(expressionTable.keySet());
         ExpressionEntry.Builder entryToUpdate = expressionTable.get(idx).toBuilder();
-
+        System.out.println("Max args: " + entryToUpdate.getMaxArg() + "\t\tArg Count" + entryToUpdate.getArgsCount());
         if (functionMapper.getMaxArgs(entryToUpdate.getFunction()) != Integer.MAX_VALUE) {
           for (int j = entryToUpdate.getArgsCount(); j < entryToUpdate.getMaxArg() - 1; j++) {
             entryToUpdate.addArgs("0"); // Placeholder
           }
         }
+        System.out.println("Args list before update" + entryToUpdate.getArgsList());
         entryToUpdate.addArgs(argBackup.remove()); // Get the previous arg
-
+        System.out.println("Args list after update" + entryToUpdate.getArgsList());
         expressionTable.replace(idx, entryToUpdate.build());
       } else {
         // This is the only variable represented.
@@ -277,7 +278,7 @@ public class MathParser {
     return sequence;
   }
 
-  /** Parser step 6.0 (no its not 5.0) */
+  /** Parser step 6.0 (no it's not 5.0) */
   public String evaluateMap(Map<Integer, ExpressionEntry> expressionTable, List<Integer> sequence) {
     HashMap<Integer, ExpressionEntry> expressions = new HashMap<>(expressionTable);
     String finalValue = "";

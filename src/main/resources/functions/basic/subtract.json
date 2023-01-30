@@ -9,5 +9,6 @@
     "function": "SUBTRACT",
     "param_pattern": "RR",
     "param_description": "",
-    "is_in_place": true
+    "is_in_place": true,
+    "regex": "((?<=[\\)\\d\\w!])\\s*(-)\\s*(?=[\\(\\d\\w]))"
 }
