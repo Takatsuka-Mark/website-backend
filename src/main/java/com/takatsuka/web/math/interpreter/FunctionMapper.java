@@ -28,22 +28,17 @@ public class FunctionMapper {
   private final Map<String, Function> multiVariableFunctionMap;
   private final Map<String, Function> symbolOperatorMap;
   private final Map<Pattern, Function> patternOperatorMap;
-  private final Map<Function, Integer> functionToMaxArgMap;
-  private final Map<Function, Method> functionToMethodMap;
-  // private final Map<Function, List<ParamType>> functionToParamTypeMap;
-  private final Map<Function, Pattern> functionToParamPattern;
   private final Map<String, Map<String, Function>> classMethodToFunction;
   private final Pattern pattern;
+
+  private final Map<Function, FunctionDefinition> functionToDefinition;
 
   public FunctionMapper(List<FunctionDefinition> functionsList) {
     multiVariableFunctionMap = new HashMap<>();
     symbolOperatorMap = new HashMap<>();
-    functionToMaxArgMap = new HashMap<>();
-    functionToMethodMap = new HashMap<>();
-    // functionToParamTypeMap = new HashMap<>();
-    functionToParamPattern = new HashMap<>();
     classMethodToFunction = new HashMap<>();
     patternOperatorMap = new HashMap<>();
+    functionToDefinition = new HashMap<>();
     ArrayList<String> patterns = new ArrayList<>();
 
     patterns.add(FUNC_REGEX);
@@ -51,18 +46,11 @@ public class FunctionMapper {
 
     // Build multi-variable functions
     for (FunctionDefinition functionDefinition : functionsList) {
+      functionToDefinition.put(functionDefinition.getFunction(), functionDefinition);
+
       // Map the symbol to the function
       multiVariableFunctionMap.put(
           functionDefinition.getSymbol().toLowerCase(), functionDefinition.getFunction());
-
-      // Map the function to max-args.
-      if (functionDefinition.getIsInPlace()){
-        functionToMaxArgMap.put(functionDefinition.getFunction(), 2);
-      } else {
-        functionToMaxArgMap.put(functionDefinition.getFunction(), functionDefinition.getMaxArgs());
-      }
-
-
 
       // Add function value
       if (functionDefinition.getIsInPlace()) {
@@ -78,36 +66,24 @@ public class FunctionMapper {
         }
         // TODO should we still add to the symbol operator map?
         symbolOperatorMap.put(functionDefinition.getSymbol(), functionDefinition.getFunction());
-      } else {
-        functionToParamPattern.put(
-          functionDefinition.getFunction(), Pattern.compile(functionDefinition.getParamPattern())
-        );
       }
-  
-      // functionToParamTypeMap.put(
-      //     functionDefinition.getFunction(), functionDefinition.getMathMethod().getParamTypesList());
+
       String className = functionDefinition.getMathMethod().getClassName();
-      Map<String, Function> tmp = classMethodToFunction.getOrDefault(className, new HashMap<String, Function>());
+      Map<String, Function> tmp = classMethodToFunction.getOrDefault(className, new HashMap<>());
       tmp.put(functionDefinition.getMathMethod().getMethodName(), functionDefinition.getFunction());
       classMethodToFunction.put(className, tmp);
     }
     patterns.add(NUM_REGEX);
     patterns.add(String.format("%s", SYMBOL_GROUPS));
 
-    // Build operator
+    // TODO replace this with a proper factorial function definition
     symbolOperatorMap.put("!", Function.FACTORIAL);
-    functionToMaxArgMap.put(Function.FACTORIAL, 1);
+    functionToDefinition.put(Function.FACTORIAL, FunctionDefinition.newBuilder().setIsInPlace(false).build());
 
     pattern = Pattern.compile(String.join("|", patterns));
   }
 
-  public Pattern getParamTypePattern(Function function) {
-    return functionToParamPattern.get(function);
-  }
-
-  public Map<Function, Method> getFunctionToMethodMap() {
-    return functionToMethodMap;
-  }
+  public FunctionDefinition getFunctionDefinition(Function function) { return functionToDefinition.get(function); }
 
   public Function mapStringToFunction(String token) {
     token = token.toLowerCase();
@@ -125,17 +101,8 @@ public class FunctionMapper {
     throw new MathParseException(token, null, MathParseException.ParseExceptionType.FUNCTION_NOT_DEFINED);
   }
 
-  public int getMaxArgs(Function function) {
-    // This should be deprecated. We can determine the number of args based on the regex, so this shouldn't be necessary.
-    return functionToMaxArgMap.getOrDefault(function, 2);
-  }
-
   public boolean isMultiVariableFunction(String symbol) {
     return multiVariableFunctionMap.containsKey(symbol);
-  }
-
-  public boolean isMultiVariableFunction(Function function) {
-    return multiVariableFunctionMap.containsValue(function);
   }
 
   public boolean isSymbolFunction(String symbol) {
@@ -162,10 +129,6 @@ public class FunctionMapper {
     return NUM_REGEX;
   }
 
-  public Pattern getNumPattern() {
-    return NUM_PATTERN;
-  }
-
   // Maps the function name to list of Hash maps mapping arg pattern to the method
   public HashMap<Function, HashMap<String, Method>> mapEvalsToMethods(List<EvaluatorGrouping> evaluators) {
     HashMap<Function, HashMap<String, Method>> methodMap = new HashMap<>();
@@ -177,7 +140,7 @@ public class FunctionMapper {
           continue;
         }
         Function function = this.classMethodToFunction.get(
-          eval.getClass().getName().toString()
+          eval.getClass().getName()
         ).get(
           method.getName()
         );
@@ -186,7 +149,7 @@ public class FunctionMapper {
           logger.warn(String.format(
             "Unable to map '%s' from class '%s'",
             method.getName(),
-            eval.getClass().getName().toString()
+            eval.getClass().getName()
           ));
           continue;
         }

@@ -24,8 +24,6 @@ message FunctionDefinition{
 
     Function function = 8;
 
-    int32 max_args = 9;
-
     bool is_in_place = 10;
 
     string regex = 12;
