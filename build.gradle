@@ -23,7 +23,7 @@ dependencies {
     implementation 'com.google.protobuf:protobuf-java:3.19.4'
     implementation 'com.google.protobuf:protobuf-java-util:3.19.4'
     implementation 'org.reflections:reflections:0.9.12'
-    implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:7.2.0'
+    implementation 'com.bucket4j:bucket4j-core:8.1.0'
     implementation group: 'io.grpc', name: 'grpc-all', version: '1.25.0'
     implementation 'io.github.resilience4j:resilience4j-timelimiter:1.7.1'
     runtimeOnly 'org.springframework.boot:spring-boot-devtools:2.6.4'
@@ -35,7 +35,7 @@ dependencies {
 }
 
 group = 'com.takatsuka'
-version = '0.0.7'
+version = '0.0.8'
 description = 'web'
 sourceCompatibility = '17'
 
@@ -88,4 +88,10 @@ protobuf {
             grpc {}
         }
     }
+}
+
+test {
+    useJUnit()
+
+    maxHeapSize = '1G'
 }

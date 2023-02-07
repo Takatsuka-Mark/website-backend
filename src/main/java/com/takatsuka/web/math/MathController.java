@@ -2,7 +2,6 @@ package com.takatsuka.web.math;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Bucket4j;
 import io.github.bucket4j.Refill;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +22,9 @@ public class MathController {
   private static final String REQUEST_OVERLOAD_MSG =
       "You're making requests too quickly! Wait a little before making another.";
 
-  // Refill one request every 6 seconds.
+  // Refill one request every 2 seconds.
   private static final Bandwidth BUCKET_BANDWIDTH =
-      Bandwidth.classic(1, Refill.intervally(1L, Duration.ofSeconds(3L)));
+      Bandwidth.classic(1, Refill.intervally(1L, Duration.ofSeconds(2L)));
 
   public MathController(MathService mathService) {
     this.mathService = mathService;
@@ -48,7 +47,7 @@ public class MathController {
     if (BUCKETS.containsKey(address)) {
       bucket = BUCKETS.get(address);
     } else {
-      bucket = Bucket4j.builder().addLimit(BUCKET_BANDWIDTH).build();
+      bucket = Bucket.builder().addLimit(BUCKET_BANDWIDTH).build();
       BUCKETS.put(address, bucket);
     }
     return bucket;

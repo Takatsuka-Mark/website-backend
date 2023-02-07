@@ -1,13 +1,13 @@
 {
   "title": "Hyperbolic Secant",
   "description": "Calculates the hyperbolic secant of a number",
-  "pattern": "sech",
+  "symbol": "sech",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
-    "methodName": "sech",
-    "paramTypes": ["DECIMAL"]
+    "methodName": "sech"
   },
-  "symbol": "sech",
   "function": "SECANT_HYPERBOLIC",
-  "maxArgs": 1
+  "param_pattern": "r",
+  "param_description": "",
+  "is_in_place": false
 }

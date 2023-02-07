@@ -3,11 +3,11 @@ package com.takatsuka.web.math.interpreter;
 import com.google.common.annotations.VisibleForTesting;
 import com.takatsuka.web.interpreter.ExpressionEntry;
 import com.takatsuka.web.interpreter.Function;
+import com.takatsuka.web.interpreter.FunctionDefinition;
 import com.takatsuka.web.logging.MathLogger;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -15,10 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class MathParser {
   private static final Logger logger = MathLogger.forCallingClass();
@@ -55,8 +53,7 @@ public class MathParser {
       tokens.add(tok);
     }
 
-    System.out.println(tokens);
-    logger.debug("Expression '{}' successfully tokenized to '{}'", expression, tokens.toString());
+    logger.debug("Expression '{}' successfully tokenized to '{}'", expression, tokens);
 
     return tokens;
   }
@@ -70,7 +67,6 @@ public class MathParser {
     int argPriority = 0;
     int funcId = 0;
     int outstandingParams = 0;
-
     for (int i = 0; i < tokens.size(); i++) {
       String token = tokens.get(i);
       if (token.matches("[(]")) {
@@ -87,7 +83,7 @@ public class MathParser {
               requiredClosingParen += 1;
             } else if (secondaryToken.matches("[)]")) {
               requiredClosingParen -= 1;
-            } else if (secondaryToken.matches("[,]") && requiredClosingParen == 1) {
+            } else if (secondaryToken.matches(",") && requiredClosingParen == 1) {
               // This is the end of the previous param. Evaluate it, and store it as a param
               secondaryTokens.remove(secondaryTokens.size() - 1); // Remove the last token ','
               String result = evaluate(secondaryTokens);
@@ -100,7 +96,7 @@ public class MathParser {
           } while (requiredClosingParen > 0);
           i -= 1;
 
-          secondaryTokens.remove(secondaryTokens.size() - 1); // Remove the last token ')'
+          secondaryTokens.remove(secondaryTokens.size() - 1); // Remove the last token ")"
           String result = String.valueOf(evaluate(secondaryTokens));
           expressionTable.put(
               funcId, expressionTable.get(funcId).toBuilder().addArgs(result).build());
@@ -112,7 +108,6 @@ public class MathParser {
         argPriority -= 10;
       } else {
         // It is not a paren.
-
         if (token.matches(functionMapper.getNumRegex())) {
           // It is a number.
           argBackup.add(token);
@@ -132,13 +127,12 @@ public class MathParser {
           expressionBuilder
               .setId(funcId)
               .setLevel(level + argPriority)
-              .setFunction(function)
-              .setMaxArg(functionMapper.getMaxArgs(function));
+              .setFunction(function);
 
-          // We shouldn't have to make this call to FunctionMapper twice.
+          // TODO We shouldn't have to make this call to FunctionMapper twice.
           if (functionMapper.isSymbolFunction(token)) {
             // This is of the form ' a [function] b '
-            if (!argBackup.isEmpty()) {
+            if (!argBackup.isEmpty() && function != Function.FACTORIAL) {
               // Add it as another variable
               expressionBuilder.addArgs(argBackup.remove());
             }
@@ -146,7 +140,6 @@ public class MathParser {
             // This is of the form ' [function]( a ) '
             outstandingParams += 1;
           }
-
           expressionTable.put(funcId, expressionBuilder.build());
         }
       }
@@ -159,13 +152,15 @@ public class MathParser {
         int idx = Collections.max(expressionTable.keySet());
         ExpressionEntry.Builder entryToUpdate = expressionTable.get(idx).toBuilder();
 
-        if (functionMapper.getMaxArgs(entryToUpdate.getFunction()) != Integer.MAX_VALUE) {
-          for (int j = entryToUpdate.getArgsCount(); j < entryToUpdate.getMaxArg() - 1; j++) {
-            entryToUpdate.addArgs("0"); // Placeholder
-          }
+        System.out.println(entryToUpdate.getFunction());
+        FunctionDefinition definition = functionMapper.getFunctionDefinition(entryToUpdate.getFunction());
+        if (definition.getIsInPlace() && entryToUpdate.getArgsCount() == 0) {
+          entryToUpdate.addArgs("0");
         }
-        entryToUpdate.addArgs(argBackup.remove()); // Get the previous arg
 
+        System.out.println("Args list before update" + entryToUpdate.getArgsList());
+        entryToUpdate.addArgs(argBackup.remove()); // Get the previous arg
+        System.out.println("Args list after update" + entryToUpdate.getArgsList());
         expressionTable.replace(idx, entryToUpdate.build());
       } else {
         // This is the only variable represented.
@@ -174,7 +169,6 @@ public class MathParser {
         expressionBuilder.setId(funcId);
         expressionBuilder.setLevel(argPriority + 1);
         expressionBuilder.addArgs(argBackup.remove());
-        expressionBuilder.setMaxArg(1);
         expressionTable.put(funcId, expressionBuilder.build());
       }
     }
@@ -214,7 +208,7 @@ public class MathParser {
       ExpressionEntry thisEntry = remainingMap.get(thisLevel);
       ExpressionEntry prevEntry = null;
       ExpressionEntry nextEntry = null;
-      ExpressionEntry biggestEntry = null;
+      ExpressionEntry biggestEntry;
       int argId = 1;
 
       // Iterate to find previous and next entry
@@ -248,11 +242,7 @@ public class MathParser {
 
       // Add this relation to the relation map, and remove it from the remainingMap
       if (biggestEntry.getId() < thisEntry.getId()) {
-        if (biggestEntry.getMaxArg() != Integer.MAX_VALUE) {
-          argId = biggestEntry.getMaxArg();
-        } else {
-          argId = biggestEntry.getArgsCount();
-        }
+        argId = biggestEntry.getArgsCount();
       }
       relationMap.put(
           thisLevel, thisEntry.toBuilder().setArgOf(biggestEntry.getId()).setArgId(argId).build());
@@ -280,13 +270,13 @@ public class MathParser {
     return sequence;
   }
 
-  /** Parser step 6.0 (no its not 5.0) */
+  /** Parser step 6.0 (no it's not 5.0) */
   public String evaluateMap(Map<Integer, ExpressionEntry> expressionTable, List<Integer> sequence) {
     HashMap<Integer, ExpressionEntry> expressions = new HashMap<>(expressionTable);
     String finalValue = "";
     for (Integer index : sequence) {
       ExpressionEntry expressionEntry = expressions.get(index);
-      finalValue =
+        finalValue =
           evaluator.evaluateFunction(expressionEntry.getFunction(), expressionEntry.getArgsList());
       int argOf = expressionEntry.getArgOf();
       int argId = expressionEntry.getArgId();
@@ -294,7 +284,6 @@ public class MathParser {
       // Ensure that we are only setting variables which need to be set, not just the value.
       if (argOf != 0) {
         ExpressionEntry.Builder expressionToUpdate = expressions.get(argOf).toBuilder();
-        //        expressionToUpdate.setArgs(argId - 1, String.valueOf(finalValue));
 
         setArg(expressionToUpdate, argId - 1, finalValue);
 
@@ -353,11 +342,4 @@ public class MathParser {
 
     return builder;
   }
-
-//  private String padNumbers(String expression) {
-//    boolean prevIsNum = false;
-//    for (String tok: expression.split("")) {
-//        if()
-//    }
-//  }
 }

@@ -1,13 +1,13 @@
 {
   "title": "Arc Secant",
   "description": "Calculates the Inverse Secant of a number",
-  "pattern": "asec",
+  "symbol": "asec",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
-    "methodName": "asec",
-    "paramTypes": ["DECIMAL"]
+    "methodName": "asec"
   },
-  "symbol": "asec",
   "function": "SECANT_INVERSE",
-  "maxArgs": 1
+  "param_pattern": "r",
+  "param_description": "",
+  "is_in_place": false
 }

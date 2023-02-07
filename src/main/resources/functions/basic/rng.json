@@ -1,13 +1,13 @@
 {
   "title": "Random",
   "description": "Computes a random integer S.T.: min <= x < max",
-  "pattern": "rng",
+  "symbol": "rng",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.RandomEvaluator",
-    "methodName": "randomInt",
-    "paramTypes": ["BIG_INTEGER", "BIG_INTEGER"]
+    "methodName": "randomInt"
   },
-  "symbol": "rng",
   "function": "RNG",
-  "maxArgs": 2
+  "param_pattern": "zz",
+  "param_description": "",
+  "is_in_place": false
 }

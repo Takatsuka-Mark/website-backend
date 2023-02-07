@@ -1,0 +1,14 @@
+{
+    "title": "Division",
+    "description": "Computes the division of A / B",
+    "symbol": "/",
+    "regex": "/(?!/)",
+    "mathMethod": {
+        "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
+        "methodName": "divide"
+    },
+    "function": "DIVIDE",
+    "param_pattern": "RR",
+    "param_description": "",
+    "is_in_place": true
+}

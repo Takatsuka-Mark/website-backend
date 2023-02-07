@@ -1,13 +1,13 @@
 {
   "title": "Tangent",
   "description": "Calculates the Tangent of a number",
-  "pattern": "tan",
+  "symbol": "tan",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
-    "methodName": "tan",
-    "paramTypes": ["DECIMAL"]
+    "methodName": "tan"
   },
-  "symbol": "tan",
   "function": "TANGENT",
-  "maxArgs": 1
+  "param_pattern": "r",
+  "param_description": "",
+  "is_in_place": false
 }

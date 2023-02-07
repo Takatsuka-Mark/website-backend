@@ -2,18 +2,12 @@ package com.takatsuka.web.math.interpreter;
 
 import com.google.common.truth.Truth;
 import com.google.common.truth.extensions.proto.ProtoTruth;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.util.JsonFormat;
 import com.takatsuka.web.interpreter.ExpressionEntry;
 import com.takatsuka.web.interpreter.Function;
-import com.takatsuka.web.interpreter.FunctionDefinition;
-import com.takatsuka.web.interpreter.MathMethod;
-import com.takatsuka.web.interpreter.ParamType;
 import com.takatsuka.web.utils.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.beans.Expression;
 import java.util.List;
 import java.util.Map;
 
@@ -108,7 +102,6 @@ public class MathParserTest {
                 .setId(1)
                 .setFunction(Function.ADD)
                 .addArgs("1")
-                .setMaxArg(2)
                 .build(),
             2,
             ExpressionEntry.newBuilder()
@@ -117,7 +110,6 @@ public class MathParserTest {
                 .setFunction(Function.MULTIPLY)
                 .addArgs("2")
                 .addArgs("9")
-                .setMaxArg(2)
                 .build());
 
     Map<Integer, ExpressionEntry> fetchedMap = mathParser.loadTokensIntoTables(testTokens);
@@ -134,7 +126,6 @@ public class MathParserTest {
             ExpressionEntry.newBuilder()
                 .setId(1)
                 .setFunction(Function.MULTIPLY)
-                .setMaxArg(2)
                 .addArgs("2")
                 .setLevel(2)
                 .build(),
@@ -142,7 +133,6 @@ public class MathParserTest {
             ExpressionEntry.newBuilder()
                 .setId(2)
                 .setFunction(Function.SQUARE_ROOT)
-                .setMaxArg(1)
                 .addArgs("9")
                 .setLevel(10)
                 .build(),
@@ -150,14 +140,12 @@ public class MathParserTest {
             ExpressionEntry.newBuilder()
                 .setId(3)
                 .setFunction(Function.ADD)
-                .setMaxArg(2)
                 .setLevel(1)
                 .build(),
             4,
             ExpressionEntry.newBuilder()
                 .setId(4)
                 .setFunction(Function.SQUARE_ROOT)
-                .setMaxArg(1)
                 .addArgs("100")
                 .setLevel(10)
                 .build());
@@ -197,7 +185,6 @@ public class MathParserTest {
             1,
             ExpressionEntry.newBuilder()
                 .setId(1)
-                .setMaxArg(2)
                 .setArgOf(0)
                 .setArgId(0)
                 .setLevel(2)
@@ -205,7 +192,6 @@ public class MathParserTest {
             2,
             ExpressionEntry.newBuilder()
                 .setId(2)
-                .setMaxArg(2)
                 .setArgOf(0)
                 .setArgId(0)
                 .setLevel(11)
@@ -213,7 +199,6 @@ public class MathParserTest {
             3,
             ExpressionEntry.newBuilder()
                 .setId(3)
-                .setMaxArg(2)
                 .setArgOf(0)
                 .setArgId(0)
                 .setLevel(2)
@@ -221,7 +206,6 @@ public class MathParserTest {
             4,
             ExpressionEntry.newBuilder()
                 .setId(4)
-                .setMaxArg(2)
                 .setArgOf(0)
                 .setArgId(0)
                 .setLevel(11)
@@ -229,7 +213,6 @@ public class MathParserTest {
             5,
             ExpressionEntry.newBuilder()
                 .setId(5)
-                .setMaxArg(2)
                 .setArgOf(0)
                 .setArgId(0)
                 .setLevel(1)
@@ -259,7 +242,6 @@ public class MathParserTest {
             ExpressionEntry.newBuilder()
                 .setId(1)
                 .setFunction(Function.ADD)
-                .setMaxArg(2)
                 .addArgs("1")
                 .addArgs("2")
                 .setArgOf(0)
@@ -269,7 +251,6 @@ public class MathParserTest {
             ExpressionEntry.newBuilder()
                 .setId(2)
                 .setFunction(Function.MULTIPLY)
-                .setMaxArg(2)
                 .addArgs("2")
                 .addArgs("9")
                 .setArgOf(1)
@@ -286,7 +267,6 @@ public class MathParserTest {
         1,
         ExpressionEntry.newBuilder()
             .setId(1)
-            .setMaxArg(2)
             .setArgOf(3)
             .setArgId(1)
             .setLevel(2)
@@ -294,7 +274,6 @@ public class MathParserTest {
         2,
         ExpressionEntry.newBuilder()
             .setId(2)
-            .setMaxArg(2)
             .setArgOf(1)
             .setArgId(2)
             .setLevel(11)
@@ -302,7 +281,6 @@ public class MathParserTest {
         3,
         ExpressionEntry.newBuilder()
             .setId(3)
-            .setMaxArg(2)
             .setArgOf(5)
             .setArgId(1)
             .setLevel(2)
@@ -310,7 +288,6 @@ public class MathParserTest {
         4,
         ExpressionEntry.newBuilder()
             .setId(4)
-            .setMaxArg(2)
             .setArgOf(3)
             .setArgId(2)
             .setLevel(11)
@@ -318,7 +295,6 @@ public class MathParserTest {
         5,
         ExpressionEntry.newBuilder()
             .setId(5)
-            .setMaxArg(2)
             .setArgOf(0)
             .setArgId(0)
             .setLevel(1)

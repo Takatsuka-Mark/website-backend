@@ -1,6 +1,8 @@
 package com.takatsuka.web.math.evaluators;
 
 import com.takatsuka.web.logging.MathLogger;
+import com.takatsuka.web.math.utils.MathEvaluator;
+import com.takatsuka.web.math.utils.MathMethod;
 import com.takatsuka.web.utils.ThreadUtils;
 import com.takatsuka.web.utils.exceptions.MathExecException;
 import org.slf4j.Logger;
@@ -10,7 +12,8 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Optional;
 
-public class ExponentialEvaluator {
+@MathEvaluator
+public class ExponentialEvaluator implements EvaluatorGrouping {
 
   private static final Logger logger = MathLogger.forCallingClass();
   private static final BigDecimal TWO = new BigDecimal(BigInteger.TWO);
@@ -20,23 +23,28 @@ public class ExponentialEvaluator {
     this.mathContext = mathContext;
   }
 
+  @MathMethod("R")
   public String lg(BigDecimal input) {
     return logn(TWO, input);
   }
 
+  @MathMethod("R")
   public String log(BigDecimal input) {
     return logn(BigDecimal.TEN, input);
   }
 
+  @MathMethod("RR")
   public String logn(BigDecimal base, BigDecimal value) {
     throw new MathExecException(
         "logn", null, MathExecException.MathExecExceptionType.FUNCTION_IN_TESTING);
   }
 
+  @MathMethod("RZ")
   public String pow(BigDecimal base, BigInteger exp) {
     return modPowHelper(base, exp, Optional.empty());
   }
 
+  @MathMethod("RZZ")
   public String modPow(BigDecimal base, BigInteger exp, BigInteger mod) {
     if (mod.signum() > 0) {
       return modPowHelper(base, exp, Optional.of(mod));

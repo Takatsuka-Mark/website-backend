@@ -1,0 +1,13 @@
+{
+    "title": "Modulous",
+    "description": "Computes the modulous of A % B",
+    "symbol": "%",
+    "mathMethod": {
+      "className": "com.takatsuka.web.math.evaluators.BasicEvaluator",
+      "methodName": "modulous"
+    },
+    "function": "MOD",
+    "param_pattern": "ZZ",
+    "param_description": "",
+    "is_in_place": true
+}

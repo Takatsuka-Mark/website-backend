@@ -1,13 +1,13 @@
 {
   "title": "Cotangent",
   "description": "Calculates the Cotangent of a number",
-  "pattern": "cot",
+  "symbol": "cot",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.TrigEvaluator",
-    "methodName": "cot",
-    "paramTypes": ["DECIMAL"]
+    "methodName": "cot"
   },
-  "symbol": "cot",
   "function": "COTANGENT",
-  "maxArgs": 1
+  "param_pattern": "r",
+  "param_description": "",
+  "is_in_place": false
 }

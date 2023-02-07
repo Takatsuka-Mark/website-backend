@@ -2,18 +2,21 @@ package com.takatsuka.web.math.evaluators;
 
 import com.takatsuka.web.logging.MathLogger;
 import com.takatsuka.web.math.interpreter.Evaluator;
+import com.takatsuka.web.math.utils.MathEvaluator;
+import com.takatsuka.web.math.utils.MathMethod;
+import com.takatsuka.web.utils.exceptions.MathExecException;
+import com.takatsuka.web.utils.exceptions.MathExecException.MathExecExceptionType;
+
 import org.slf4j.Logger;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 
-public class BasicEvaluator {
+@MathEvaluator
+public class BasicEvaluator implements EvaluatorGrouping {
 
   private static final Logger logger = MathLogger.forCallingClass();
   private final MathContext mathContext;
@@ -22,14 +25,61 @@ public class BasicEvaluator {
     this.mathContext = mathContext;
   }
 
+  @MathMethod("RR")
+  public String add(BigDecimal A, BigDecimal B) {
+    return String.valueOf(A.add(B));
+  }
+
+  @MathMethod("RR")
+  public String subtract(BigDecimal A, BigDecimal B) {
+    return String.valueOf(A.subtract(B));
+  }
+
+  @MathMethod("RR")
+  public String multiply(BigDecimal A, BigDecimal B) {
+    return String.valueOf(A.multiply(B));
+  }
+
+  @MathMethod("ZZ")
+  public String modulous(BigInteger A, BigInteger B) {
+    return String.valueOf(A.mod(B));
+  }
+
+  @MathMethod("RR")
+  public String divide(BigDecimal A, BigDecimal B) {
+    if (B.equals(BigDecimal.ZERO)) {
+      throw new MathExecException(
+        String.format("%s / %s", A.toString(), B.toString()),
+        null,
+        MathExecExceptionType.DIV_BY_ZERO
+      );
+    }
+    return String.valueOf(A.divide(B));
+  }
+
+  @MathMethod("ZZ")
+  public String intDivide(BigInteger A, BigInteger B) {
+    if (B.equals(BigInteger.ZERO)) {
+      throw new MathExecException(
+        String.format("%s / %s", A.toString(), B.toString()),
+        null,
+        MathExecExceptionType.DIV_BY_ZERO
+      );
+    }
+    return String.valueOf(A.divide(B));
+  }
+
+  @MathMethod("R")
   public String absoluteValue(BigDecimal input) {
     return String.valueOf(input.abs(mathContext));
   }
 
+  @MathMethod("R")
   public String squareRoot(BigDecimal input) {
     return String.valueOf(input.sqrt(mathContext));
   }
 
+  @MathMethod("R+")
   public String max(List<BigDecimal> input) {
     Optional<BigDecimal> result = input.stream().max(BigDecimal::compareTo);
     if (result.isPresent()) {
@@ -39,6 +89,7 @@ public class BasicEvaluator {
     }
   }
 
+  @MathMethod("R+")
   public String min(List<BigDecimal> input) {
     Optional<BigDecimal> result = input.stream().min(BigDecimal::compareTo);
     if (result.isPresent()) {
@@ -48,10 +99,12 @@ public class BasicEvaluator {
     }
   }
 
+  @MathMethod("Z+")
   public String gcd(List<BigInteger> input) {
     return gcdEuclidean(input).toString();
   }
 
+  @MathMethod("Z+")
   public String lcm(List<BigInteger> input) {
     return lcmThroughGcd(input).toString();
   }

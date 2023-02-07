@@ -1,13 +1,13 @@
 {
   "title": "Lg | Log 2",
   "description": "Calculates the log base 2 of a value",
-  "pattern": "lg",
+  "symbol": "lg",
   "mathMethod": {
     "className": "com.takatsuka.web.math.evaluators.ExponentialEvaluator",
-    "methodName": "lg",
-    "paramTypes": ["BIG_DECIMAL"]
+    "methodName": "lg"
   },
-  "symbol": "lg",
   "function": "LG",
-  "maxArgs": 1
+  "param_pattern": "z",
+  "param_description": "",
+  "is_in_place": false
 }
