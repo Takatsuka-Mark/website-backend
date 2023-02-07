@@ -152,15 +152,12 @@ public class MathParser {
         int idx = Collections.max(expressionTable.keySet());
         ExpressionEntry.Builder entryToUpdate = expressionTable.get(idx).toBuilder();
 
-        System.out.println(entryToUpdate.getFunction());
         FunctionDefinition definition = functionMapper.getFunctionDefinition(entryToUpdate.getFunction());
         if (definition.getIsInPlace() && entryToUpdate.getArgsCount() == 0) {
           entryToUpdate.addArgs("0");
         }
 
-        System.out.println("Args list before update" + entryToUpdate.getArgsList());
         entryToUpdate.addArgs(argBackup.remove()); // Get the previous arg
-        System.out.println("Args list after update" + entryToUpdate.getArgsList());
         expressionTable.replace(idx, entryToUpdate.build());
       } else {
         // This is the only variable represented.
@@ -242,7 +239,11 @@ public class MathParser {
 
       // Add this relation to the relation map, and remove it from the remainingMap
       if (biggestEntry.getId() < thisEntry.getId()) {
-        argId = biggestEntry.getArgsCount();
+        if(functionMapper.getFunctionDefinition(biggestEntry.getFunction()).getIsInPlace()){
+          argId = 2;
+        } else {
+          argId = biggestEntry.getArgsCount();
+        }
       }
       relationMap.put(
           thisLevel, thisEntry.toBuilder().setArgOf(biggestEntry.getId()).setArgId(argId).build());

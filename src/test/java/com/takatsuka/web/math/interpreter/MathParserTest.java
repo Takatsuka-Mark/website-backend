@@ -188,6 +188,7 @@ public class MathParserTest {
                 .setArgOf(0)
                 .setArgId(0)
                 .setLevel(2)
+                .setFunction(Function.MULTIPLY)
                 .build(),
             2,
             ExpressionEntry.newBuilder()
@@ -195,6 +196,7 @@ public class MathParserTest {
                 .setArgOf(0)
                 .setArgId(0)
                 .setLevel(11)
+                .setFunction(Function.ADD)
                 .build(),
             3,
             ExpressionEntry.newBuilder()
@@ -202,6 +204,7 @@ public class MathParserTest {
                 .setArgOf(0)
                 .setArgId(0)
                 .setLevel(2)
+                .setFunction(Function.MULTIPLY)
                 .build(),
             4,
             ExpressionEntry.newBuilder()
@@ -209,6 +212,7 @@ public class MathParserTest {
                 .setArgOf(0)
                 .setArgId(0)
                 .setLevel(11)
+                .setFunction(Function.SUBTRACT)
                 .build(),
             5,
             ExpressionEntry.newBuilder()
@@ -216,6 +220,7 @@ public class MathParserTest {
                 .setArgOf(0)
                 .setArgId(0)
                 .setLevel(1)
+                .setFunction(Function.ADD)
                 .build());
 
     Map<Integer, ExpressionEntry> returnedMap = mathParser.buildRelations(inputMap);
@@ -270,6 +275,7 @@ public class MathParserTest {
             .setArgOf(3)
             .setArgId(1)
             .setLevel(2)
+            .setFunction(Function.MULTIPLY)
             .build(),
         2,
         ExpressionEntry.newBuilder()
@@ -277,6 +283,7 @@ public class MathParserTest {
             .setArgOf(1)
             .setArgId(2)
             .setLevel(11)
+            .setFunction(Function.ADD)
             .build(),
         3,
         ExpressionEntry.newBuilder()
@@ -284,6 +291,7 @@ public class MathParserTest {
             .setArgOf(5)
             .setArgId(1)
             .setLevel(2)
+            .setFunction(Function.MULTIPLY)
             .build(),
         4,
         ExpressionEntry.newBuilder()
@@ -291,6 +299,7 @@ public class MathParserTest {
             .setArgOf(3)
             .setArgId(2)
             .setLevel(11)
+            .setFunction(Function.SUBTRACT)
             .build(),
         5,
         ExpressionEntry.newBuilder()
@@ -298,6 +307,7 @@ public class MathParserTest {
             .setArgOf(0)
             .setArgId(0)
             .setLevel(1)
+            .setFunction(Function.ADD)
             .build());
   }
 }
